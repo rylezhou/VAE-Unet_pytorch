@@ -49,7 +49,9 @@ def generate_dataset_json(output_file: str, imagesTr_dir: str, imagesTs_dir: str
     if imagesTs_dir is not None:
         test_identifiers = get_identifiers_from_splitted_files(imagesTs_dir)
     else:
-        test_identifiers = []
+        print("no input for Test directory")
+        test_identifiers = None
+        
 
     json_dict = {}
     json_dict['name'] = dataset_name
@@ -60,16 +62,23 @@ def generate_dataset_json(output_file: str, imagesTr_dir: str, imagesTs_dir: str
     json_dict['release'] = dataset_release
     json_dict['modality'] = {str(i): modalities[i] for i in range(len(modalities))}
     json_dict['labels'] = {str(i): labels[i] for i in labels.keys()}
-
+    if test_identifiers is not None:      
+        json_dict['numTest'] = len(test_identifiers)
+        json_dict['numTotal'] = len(train_identifiers) + len(test_identifiers)
+        json_dict['test'] = ["./imagesTs/%s.nii.gz" % i for i in test_identifiers]
+    else:
+        json_dict['numTest'] = 0
+        json_dict['numTotal'] = len(train_identifiers)
+        json_dict['test'] = []
+        
     json_dict['numTraining'] = len(train_identifiers)
-    json_dict['numTest'] = []
     json_dict['training'] = [
         {'image': "./imagesTr/%s.nii.gz" % i, "label": "./labelsTr/%s.nii.gz" % i} for i
-        in
-        train_identifiers]
-    json_dict['test'] = ["./imagesTs/%s.nii.gz" % i for i in test_identifiers]
+        in train_identifiers]
+    
 
     if not output_file.endswith("dataset.json"):
         print("WARNING: output file name is not dataset.json! This may be intentional or not. You decide. "
               "Proceeding anyways...")
     save_json(json_dict, os.path.join(output_file))
+    print("json file generated")

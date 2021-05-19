@@ -13,7 +13,6 @@
 #    limitations under the License.
 import shutil
 from itertools import combinations
-import nnunet
 from batchgenerators.utilities.file_and_folder_operations import *
 from evaluation.add_mean_dice_to_json import foreground_mean
 from evaluation.evaluator import evaluate_folder

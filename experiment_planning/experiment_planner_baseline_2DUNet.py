@@ -15,7 +15,6 @@
 
 import shutil
 
-import nnunet
 import numpy as np
 from batchgenerators.utilities.file_and_folder_operations import load_pickle, subfiles
 from multiprocessing.pool import Pool

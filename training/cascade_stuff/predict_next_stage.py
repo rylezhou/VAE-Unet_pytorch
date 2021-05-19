@@ -20,7 +20,6 @@ from batchgenerators.utilities.file_and_folder_operations import *
 import argparse
 from preprocessing.preprocessing import resample_data_or_seg
 from batchgenerators.utilities.file_and_folder_operations import maybe_mkdir_p
-import nnunet
 from run.default_configuration import get_default_configuration
 from multiprocessing import Pool
 

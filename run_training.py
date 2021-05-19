@@ -16,13 +16,13 @@
 import argparse
 from batchgenerators.utilities.file_and_folder_operations import *
 from run.default_configuration import get_default_configuration
-from ..paths import default_plans_identifier
-from .load_pretrained_weights import load_pretrained_weights
-from ..training.cascade_stuff.predict_next_stage import predict_next_stage
-from ..training.network_training.nnUNetTrainer import nnUNetTrainer
-from ..training.network_training.nnUNetTrainerCascadeFullRes import nnUNetTrainerCascadeFullRes
-from ..training.network_training.nnUNetTrainerV2_CascadeFullRes import nnUNetTrainerV2CascadeFullRes
-from ..utilities.task_name_id_conversion import convert_id_to_task_name
+from paths import default_plans_identifier
+from run.load_pretrained_weights import load_pretrained_weights
+from training.cascade_stuff.predict_next_stage import predict_next_stage
+from training.network_training.nnUNetTrainer import nnUNetTrainer
+from training.network_training.nnUNetTrainerCascadeFullRes import nnUNetTrainerCascadeFullRes
+from training.network_training.nnUNetTrainerV2_CascadeFullRes import nnUNetTrainerV2CascadeFullRes
+from utilities.task_name_id_conversion import convert_id_to_task_name
 
 
 def main():
@@ -137,7 +137,7 @@ def main():
     trainer_class = get_default_configuration(network, task, network_trainer, plans_identifier)
 
     if trainer_class is None:
-        raise RuntimeError("Could not find trainer class in nnunet.training.network_training")
+        raise RuntimeError("Could not find trainer class in training.network_training")
 
     if network == "3d_cascade_fullres":
         assert issubclass(trainer_class, (nnUNetTrainerCascadeFullRes, nnUNetTrainerV2CascadeFullRes)), \

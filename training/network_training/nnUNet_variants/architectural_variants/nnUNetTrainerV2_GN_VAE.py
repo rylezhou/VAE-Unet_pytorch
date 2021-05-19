@@ -13,14 +13,15 @@
 #    limitations under the License.
 import torch
 from network_architecture.generic_UNet import Generic_UNet
-from network_architecture.generic_modular_residual_UNet import Generic_UNet
+# from network_architecture.generic_modular_residual_UNet import Generic_UNet
 from network_architecture.initialization import InitWeights_He
 from training.network_training.nnUNetTrainerV2 import nnUNetTrainerV2
 from network_architecture.custom_modules.helperModules import MyGroupNorm
 from utilities.nd_softmax import softmax_helper
 from torch import nn
 
-
+INIT_WEIGHT = 1e-5
+# INIT_WEIGHT = 1e-2
 class nnUNetTrainerV2_GN(nnUNetTrainerV2):
     def initialize_network(self):
         """
@@ -44,7 +45,7 @@ class nnUNetTrainerV2_GN(nnUNetTrainerV2):
         self.network = Generic_UNet(self.num_input_channels, self.base_num_features, self.num_classes,
                                     len(self.net_num_pool_op_kernel_sizes),
                                     self.conv_per_stage, 2, conv_op, norm_op, norm_op_kwargs, dropout_op, dropout_op_kwargs,
-                                    net_nonlin, net_nonlin_kwargs, True, False, lambda x: x, InitWeights_He(1e-2),
+                                    net_nonlin, net_nonlin_kwargs, True, False, lambda x: x, InitWeights_He(INIT_WEIGHT),
                                     self.net_num_pool_op_kernel_sizes, self.net_conv_kernel_sizes, False, True, True)
         if torch.cuda.is_available():
             self.network.cuda()

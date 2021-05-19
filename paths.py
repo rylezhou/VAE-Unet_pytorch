@@ -36,7 +36,7 @@ PLEASE READ paths.md FOR INFORMATION TO HOW TO SET THIS UP
 
 base = '/home/jupyter/nnUNet-pytorch/nnUNet_raw_data_base'
 preprocessing_output_dir = "/home/jupyter/nnUNet-pytorch/preprocessed"
-network_training_output_dir_base = "/home/jupyter/nnUNet-pytorch/trained_models/"
+network_training_output_dir_base = "/home/jupyter/sunet-pytorch/trained_models/"
 
 if base is not None:
     nnUNet_raw_data = join(base, "nnUNet_raw_data")

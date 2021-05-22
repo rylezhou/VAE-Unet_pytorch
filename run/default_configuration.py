@@ -31,7 +31,7 @@ def get_configuration_from_output_folder(folder):
 
 
 def get_default_configuration(network, task, network_trainer, plans_identifier=default_plans_identifier,
-                            #   search_in=(__path__[0], "training", "network_training"),
+                            #   search_in=(__path__[0], "training", "network_training"), //moved file locatioin 
                               search_in=("training", "network_training"),
                               base_module='training.network_training'):
     assert network in ['2d', '3d_lowres', '3d_fullres', '3d_cascade_fullres'], \

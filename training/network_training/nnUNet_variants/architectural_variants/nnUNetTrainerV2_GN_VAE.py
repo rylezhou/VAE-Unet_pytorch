@@ -22,7 +22,7 @@ from torch import nn
 
 INIT_WEIGHT = 1e-5
 # INIT_WEIGHT = 1e-2
-class nnUNetTrainerV2_GN(nnUNetTrainerV2):
+class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
     def initialize_network(self):
         """
         changed deep supervision to False

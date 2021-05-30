@@ -499,7 +499,7 @@ class DC_and_CE_KL_Loss(nn.Module):
         return result
 
 
-class CustomKLLoss(_Loss):
+class CustomKLLoss(nn.Module):
     '''
     KL_Loss = (|dot(mean , mean)| + |dot(std, std)| - |log(dot(std, std))| - 1) / N
     N is the total number of image voxels

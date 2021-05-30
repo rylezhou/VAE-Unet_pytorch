@@ -89,7 +89,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
       
 
         data = maybe_to_torch(data)
-        target = maybe_to_torch(target)
+        target = torch.from_numpy(target).float()
 
         target = torch.cat((target, data), dim=1)
 

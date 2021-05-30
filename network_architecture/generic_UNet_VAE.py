@@ -76,13 +76,13 @@ class VDResampling(nn.Module):
     def forward(self, x):
         out = self.gn1(x)
         out = self.actv1(out)
-        print("ACTIVATE SIZE:", out.size())
+        # print("ACTIVATE SIZE:", out.size())
         out = self.conv1(out)
-        print("COV SIZE:", out.size())
+        # print("COV SIZE:", out.size())
         out = out.view(-1, self.num_flat_features(out))
-        print("FLAT SIZE:", out.size())
+        # print("FLAT SIZE:", out.size())
         out_vd = self.dense1(out)
-        print("DENSE1 SIZE:", out_vd.size())
+        # print("DENSE1 SIZE:", out_vd.size())
         out_vd = self.actv_vd(out_vd)
         # ACTIVATE SIZE: torch.Size([2, 320, 5, 7, 4])
         # COV SIZE: torch.Size([2, 16, 3, 4, 2])
@@ -90,17 +90,17 @@ class VDResampling(nn.Module):
         # DENSE1 SIZE: torch.Size([2, 320])
         distr = out_vd 
         out = VDraw(out_vd)
-        print("VDraw SIZE:", out.size())
+        # print("VDraw SIZE:", out.size())
 
 
         out = self.dense2(out)
-        print("DENSE2 SIZE:", out.size())
+        # print("DENSE2 SIZE:", out.size())
         out = self.actv2(out)
-        print("ACTI2 SIZE:", out.size())
+        # print("ACTI2 SIZE:", out.size())
         out = out.view((-1, self.midChans, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
-        print("VIEW SIZE:", out.size())
+        # print("VIEW SIZE:", out.size())
         out = self.up0(out)
-        print("UPSAMPL SIZE:", out.size())
+        # print("UPSAMPL SIZE:", out.size())
         
         return out, distr
         

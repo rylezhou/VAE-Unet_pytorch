@@ -85,13 +85,14 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         """
         data_dict = next(data_generator)
         data = data_dict['data']
-        print("data size", data.shape)
         target = data_dict['target']
-        print("data size", target.shape)
-        target = np.concatenate((target, data), axis=0)
+      
 
         data = maybe_to_torch(data)
         target = maybe_to_torch(target)
+
+        target = torch.cat((target, data), dim=1)
+
 
         if torch.cuda.is_available():
             data = to_cuda(data)

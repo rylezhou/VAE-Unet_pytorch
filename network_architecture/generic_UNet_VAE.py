@@ -54,7 +54,7 @@ class VDResampling(nn.Module):
     '''
     Variational Auto-Encoder Resampling block
     '''
-    def __init__(self, inChans=256, outChans=256, dense_features=(10,12,8), stride=2, kernel_size=3, padding=1, activation="relu", normalization="group_normalization"):
+    def __init__(self, inChans=256, outChans=256, dense_features=(10,12,8), stride=2, kernel_size=3, padding=1, activation="LeakyReLU", normalization="group_normalization"):
         super(VDResampling, self).__init__()
         
         midChans = int(inChans / 2)
@@ -103,11 +103,11 @@ class VDecoderBlock(nn.Module):
     '''
     Variational Decoder block
     '''
-    def __init__(self, inChans, outChans, activation="relu", normalization="group_normalization", mode="trilinear"):
+    def __init__(self, inChans, outChans, activation="LeakyReLU", normalization="group_normalization", mode="trilinear"):
         super(VDecoderBlock, self).__init__()
 
         self.up0 = LinearUpSampling(inChans, outChans, mode=mode)
-        self.block = DecoderBlock(outChans, outChans, activation=activation, normalization=normalization)
+        self.block = DecoderBlock(outChans, outChans, activation="LeakyReLU", normalization="group_normalization")
     
     def forward(self, x):
         out = self.up0(x)
@@ -119,7 +119,7 @@ class DecoderBlock(nn.Module):
     '''
     Decoder block
     '''
-    def __init__(self, inChans, outChans, stride=1, padding=1, num_groups=8, activation="relu", normalizaiton="group_normalization"):
+    def __init__(self, inChans, outChans, stride=1, padding=1, num_groups=8, activation="LeakyReLU", normalizaiton="group_normalization"):
         super(DecoderBlock, self).__init__()
         
         if normalizaiton == "group_normalization":
@@ -131,9 +131,9 @@ class DecoderBlock(nn.Module):
         if activation == "relu":
             self.actv1 = nn.ReLU(inplace=True)
             self.actv2 = nn.ReLU(inplace=True)
-        elif activation == "elu":
-            self.actv1 = nn.ELU(inplace=True)
-            self.actv2 = nn.ELU(inplace=True)            
+        elif activation == "LeakyReLU":
+            self.actv1 = nn.LeakyReLU(negative_slope=1e-2, inplace=True)
+            self.actv2 = nn.LeakyReLU(negative_slope=1e-2, inplace=True)           
         self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=outChans, kernel_size=3, stride=stride, padding=padding)
         self.conv2 = nn.Conv3d(in_channels=outChans, out_channels=outChans, kernel_size=3, stride=stride, padding=padding)
         

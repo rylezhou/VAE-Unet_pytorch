@@ -91,7 +91,7 @@ class VDResampling(nn.Module):
         # DENSE1 SIZE: torch.Size([2, 320])
         distr = out_vd 
         out = VDraw(out_vd)
-        print("VDraw SIZE:", out.size())
+        # print("VDraw SIZE:", out.size())
 
     #     VDraw SIZE: torch.Size([2, 160])
     # DENSE2 SIZE: torch.Size([2, 3840])  match [2, 5,14,8]
@@ -99,11 +99,11 @@ class VDResampling(nn.Module):
     # VIEW SIZE: torch.Size([2, 160, 3, 4, 2])
     # UPSAMPL SIZE: torch.Size([2, 320, 6, 8, 4])
         out = self.dense2(out)
-        print("DENSE2 SIZE:", out.size())
+        # print("DENSE2 SIZE:", out.size())
         out = self.actv2(out)
-        print("ACTI2 SIZE:", out.size())
+        # print("ACTI2 SIZE:", out.size())
         out = out.view((-1, self.inChans, self.out_dense_features[0],self.out_dense_features[1],self.out_dense_features[2]))
-        print("VIEW SIZE:", out.size())
+        # print("VIEW SIZE:", out.size())
         
         return out, distr
         
@@ -453,13 +453,13 @@ class VAE(nn.Module):
         # print('OUT2 size',out.size())
         # out: (B, 80, 20, 56, 32)
         out = self.vd_block2(out)
-        print('OUT3 size',out.size())
+        # print('OUT3 size',out.size())
         # out: (B, 40, 40, 112, 64)
         out = self.vd_block1(out)
-        print('OUT4 size',out.size())
+        # print('OUT4 size',out.size())
         # out: (B, 20, 80, 224, 128)
         out = self.vd_block0(out)
-        print('OUT5 size',out.size())
+        # print('OUT5 size',out.size())
         # out: (B, 1, 80, 224, 128)
         out = self.vd_end(out)
 
@@ -512,7 +512,7 @@ class Generic_UNet_VAE(Generic_UNet):
         seg_outputs = []
         for d in range(len(self.conv_blocks_context) - 1):
             x = self.conv_blocks_context[d](x)
-            print('encoder', x.size())
+            # print('encoder', x.size())
             skips.append(x)
             if not self.convolutional_pooling:
                 x = self.td[d](x)

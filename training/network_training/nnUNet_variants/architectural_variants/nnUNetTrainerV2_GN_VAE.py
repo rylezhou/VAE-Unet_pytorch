@@ -86,14 +86,14 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         data_dict = next(data_generator)
         data = data_dict['data']
         target = data_dict['target']
-        print([t.shape for t in target])
+        # print([t.shape for t in target])
       
 
         data = maybe_to_torch(data)
     
-        target = torch.from_numpy(target).float()
+        target = maybe_to_torch(target)
 
-        target = torch.cat((target, data), dim=1)
+        target = torch.cat((target[0], data), dim=1)
 
 
         if torch.cuda.is_available():

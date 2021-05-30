@@ -427,7 +427,7 @@ class DC_and_topk_loss(nn.Module):
 
 
 class DC_and_CE_KL_Loss(nn.Module):
-    def __init__(self, soft_dice_kwargs, ce_kwargs, aggregate="sum", square_dice=False, weight_ce=1, weight_dice=1,
+    def __init__(self, soft_dice_kwargs, ce_kwargs, aggregate="sum", square_dice=False, weight_ce=1, weight_dice=1,weight_kl=0.1, weight_mse=0.1,
                  log_dice=False, ignore_label=None):
         """
         CAREFUL. Weights for CE and Dice do not need to sum to one. You can set whatever you want.
@@ -450,6 +450,11 @@ class DC_and_CE_KL_Loss(nn.Module):
 
         self.ignore_label = ignore_label
 
+        self.weight_kl = weight_kl
+        self.weight_mse = weight_mse
+        self.l2_loss = nn.MSELoss()
+        self.kl_loss = CustomKLLoss()
+
         if not square_dice:
             self.dc = SoftDiceLoss(apply_nonlin=softmax_helper, **soft_dice_kwargs)
         else:
@@ -470,6 +475,8 @@ class DC_and_CE_KL_Loss(nn.Module):
         else:
             mask = None
 
+        net_output, vae_outputs, vae_distr = net_output
+
         dc_loss = self.dc(net_output, target, loss_mask=mask) if self.weight_dice != 0 else 0
         if self.log_dice:
             dc_loss = -torch.log(-dc_loss)
@@ -479,8 +486,26 @@ class DC_and_CE_KL_Loss(nn.Module):
             ce_loss *= mask[:, 0]
             ce_loss = ce_loss.sum() / mask.sum()
 
+        vae_distr_dim = vae_distr.size(1)
+        est_mean, est_std = (vae_distr[:, :vae_distr_dim//2], vae_distr[:, vae_distr_dim//2:])
+        vae_pred, vae_truth = (vae_outputs, target[:,1:,:,:,:])
+        l2_loss = self.l2_loss(vae_pred, vae_truth)
+        kl_div = self.kl_loss(est_mean, est_std)
+
         if self.aggregate == "sum":
-            result = self.weight_ce * ce_loss + self.weight_dice * dc_loss
+            result = self.weight_ce * ce_loss + self.weight_dice * dc_loss + self.weight_kl * kl_div + self.weight_mse * l2_loss
         else:
             raise NotImplementedError("nah son") # reserved for other stuff (later)
         return result
+
+
+class CustomKLLoss(_Loss):
+    '''
+    KL_Loss = (|dot(mean , mean)| + |dot(std, std)| - |log(dot(std, std))| - 1) / N
+    N is the total number of image voxels
+    '''
+    def __init__(self, *args, **kwargs):
+        super(CustomKLLoss, self).__init__()
+
+    def forward(self, mean, std):
+        return torch.mean(torch.mul(mean, mean)) + torch.mean(torch.mul(std, std)) - torch.mean(torch.log(torch.mul(std, std))) - 1

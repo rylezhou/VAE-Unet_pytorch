@@ -244,10 +244,6 @@ class VAE_ResidualUNetEncoder(nn.Module):
         
         # cum_upsample = np.cumprod(np.vstack(self.stage_pool_kernel_size), axis=0).astype(int)
         
-        # #add
-        # self.dense1 = nn.Linear(base_num_features*cum_upsample, out_features=input_channels)
-        # self.dense2 = nn.Linear(in_features=input_channels/2, out_features=cum_upsample)
-        # self.up0 = Upsample(input_channels/2, base_num_features, scale_factor=2, mode="trilinear")
 
         self.stages = nn.ModuleList(self.stages)
 
@@ -262,18 +258,12 @@ class VAE_ResidualUNetEncoder(nn.Module):
 
         # x = self.initial_nonlin(self.initial_norm(self.initial_conv(x)))
         x = self.nonlin(self.norm1(self.conv1(x)))
-        # x = x.view(-1, self.num_flat_features(x))
-        # out_vd = self.dense1(x)
-        # distr = out_vd 
-        # out = VDraw(out_vd)
-        # out = self.dense2(out)
-        # out = self.nonlin(out)
-        # out = out.view((-1, 128, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
-        # out = self.up0(out)
+    
 
 
         for s in self.stages:
             x = s(x)
+            print('encoder', x.size())
             if self.default_return_skips:
                 skips.append(x)
 

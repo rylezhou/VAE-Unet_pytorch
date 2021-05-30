@@ -478,7 +478,7 @@ class Generic_UNet_VAE(Generic_UNet):
                  seg_output_use_bias)
 
         # Variational Auto-Encoder
-        self.vae = VAE(320, outChans=input_channels, dense_features=(5, 7, 4))
+        self.vae = VAE(320, outChans=input_channels, dense_features=(3, 4, 2))
     
     def forward(self, x):
 

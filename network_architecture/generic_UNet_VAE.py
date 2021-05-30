@@ -75,9 +75,13 @@ class VDResampling(nn.Module):
     def forward(self, x):
         out = self.gn1(x)
         out = self.actv1(out)
+        print("ACTIVATE SIZE:", out.size())
         out = self.conv1(out)
+        print("COV SIZE:", out.size())
         out = out.view(-1, self.num_flat_features(out))
+        print("FLAT SIZE:", out.size())
         out_vd = self.dense1(out)
+
         distr = out_vd 
         out = VDraw(out_vd)
         out = self.dense2(out)

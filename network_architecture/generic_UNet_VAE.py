@@ -452,10 +452,15 @@ class VAE(nn.Module):
         
     def forward(self, x):
         out, distr = self.vd_resample(x)
+        print('OUT1 size',out.size())
         out = self.vd_block2(out)
+        print('OUT2 size',out.size())
         out = self.vd_block1(out)
+        print('OUT3 size',out.size())
         out = self.vd_block0(out)
+        print('OUT4 size',out.size())
         out = self.vd_end(out)
+        print('OUT5 size',out.size())
 
         return out, distr
 

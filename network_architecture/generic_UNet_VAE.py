@@ -124,11 +124,11 @@ class VDecoderBlock(nn.Module):
     '''
     Variational Decoder block
     '''
-    def __init__(self, inChans, outChans, activation="LeakyReLU", normalization="group_normalization", mode="trilinear"):
+    def __init__(self, inChans, outChans, num_groups=8, activation="LeakyReLU", normalization="group_normalization", mode="trilinear"):
         super(VDecoderBlock, self).__init__()
 
         self.up0 = LinearUpSampling(inChans, outChans, mode=mode)
-        self.block = DecoderBlock(outChans, outChans, activation=activation, normalization=normalization)
+        self.block = DecoderBlock(outChans, outChans, num_groups=num_groups, activation=activation, normalization=normalization)
     
     def forward(self, x):
         out = self.up0(x)

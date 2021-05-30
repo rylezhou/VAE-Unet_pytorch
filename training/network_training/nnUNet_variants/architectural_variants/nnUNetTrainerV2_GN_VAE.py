@@ -86,9 +86,11 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         data_dict = next(data_generator)
         data = data_dict['data']
         target = data_dict['target']
+        print(target[0])
       
 
         data = maybe_to_torch(data)
+    
         target = torch.from_numpy(target).float()
 
         target = torch.cat((target, data), dim=1)

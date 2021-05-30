@@ -86,7 +86,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         data_dict = next(data_generator)
         data = data_dict['data']
         target = data_dict['target']
-        print(target[0].shape)
+        print(len(target))
       
 
         data = maybe_to_torch(data)

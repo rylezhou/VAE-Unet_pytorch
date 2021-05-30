@@ -27,93 +27,93 @@ from network_architecture.generic_modular_UNet import PlainConvUNetDecoder, get_
 
 import torch.nn.functional
 
-# class LinearUpSampling(nn.Module):
-#     '''
-#     Trilinear interpolate to upsampling
-#     '''
-#     def __init__(self, inChans, outChans, scale_factor=2, mode="trilinear", align_corners=True):
-#         super(LinearUpSampling, self).__init__()
-#         self.scale_factor = scale_factor
-#         self.mode = mode
-#         self.align_corners = align_corners
-#         self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=outChans, kernel_size=1)
-#         self.conv2 = nn.Conv3d(in_channels=inChans, out_channels=outChans, kernel_size=1)
+class LinearUpSampling(nn.Module):
+    '''
+    Trilinear interpolate to upsampling
+    '''
+    def __init__(self, inChans, outChans, scale_factor=2, mode="trilinear", align_corners=True):
+        super(LinearUpSampling, self).__init__()
+        self.scale_factor = scale_factor
+        self.mode = mode
+        self.align_corners = align_corners
+        self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=outChans, kernel_size=1)
+        self.conv2 = nn.Conv3d(in_channels=inChans, out_channels=outChans, kernel_size=1)
     
-#     def forward(self, x, skipx=None):
-#         out = self.conv1(x)
-#         # out = self.up1(out)
-#         out = nn.functional.interpolate(out, scale_factor=self.scale_factor, mode=self.mode, align_corners=self.align_corners)
+    def forward(self, x, skipx=None):
+        out = self.conv1(x)
+        # out = self.up1(out)
+        out = nn.functional.interpolate(out, scale_factor=self.scale_factor, mode=self.mode, align_corners=self.align_corners)
 
-#         if skipx is not None:
-#             out = torch.cat((out, skipx), 1)
-#             out = self.conv2(out)
+        if skipx is not None:
+            out = torch.cat((out, skipx), 1)
+            out = self.conv2(out)
         
-#         return out
+        return out
 
-# class VDResampling(nn.Module):
-#     '''
-#     Variational Auto-Encoder Resampling block
-#     '''
-#     def __init__(self, inChans=256, outChans=256, dense_features=(10,12,8), stride=2, kernel_size=3, padding=1, activation="relu", normalization="group_normalization"):
-#         super(VDResampling, self).__init__()
+class VDResampling(nn.Module):
+    '''
+    Variational Auto-Encoder Resampling block
+    '''
+    def __init__(self, inChans=256, outChans=256, dense_features=(10,12,8), stride=2, kernel_size=3, padding=1, activation="relu", normalization="group_normalization"):
+        super(VDResampling, self).__init__()
         
-#         midChans = int(inChans / 2)
-#         self.dense_features = dense_features
-#         if normalization == "group_normalization":
-#             self.gn1 = nn.GroupNorm(num_groups=8,num_channels=inChans)
-#         if activation == "relu":
-#             self.actv1 = nn.ReLU(inplace=True)
-#             self.actv2 = nn.ReLU(inplace=True)
-#         elif activation == "elu":
-#             self.actv1 = nn.ELU(inplace=True)
-#             self.actv2 = nn.ELU(inplace=True)
-#         self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=16, kernel_size=kernel_size, stride=stride, padding=padding)
-#         self.dense1 = nn.Linear(in_features=16*dense_features[0]*dense_features[1]*dense_features[2], out_features=inChans)
-#         self.dense2 = nn.Linear(in_features=midChans, out_features=midChans*dense_features[0]*dense_features[1]*dense_features[2])
-#         self.up0 = LinearUpSampling(midChans,outChans)
+        midChans = int(inChans / 2)
+        self.dense_features = dense_features
+        if normalization == "group_normalization":
+            self.gn1 = nn.GroupNorm(num_groups=8,num_channels=inChans)
+        if activation == "relu":
+            self.actv1 = nn.ReLU(inplace=True)
+            self.actv2 = nn.ReLU(inplace=True)
+        elif activation == "LeakyReLU":
+            self.actv1 = nn.LeakyReLU(negative_slope=1e-2, inplace=True)
+            self.actv2 = nn.LeakyReLU(negative_slope=1e-2, inplace=True)
+        self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=16, kernel_size=kernel_size, stride=stride, padding=padding)
+        self.dense1 = nn.Linear(in_features=16*dense_features[0]*dense_features[1]*dense_features[2], out_features=inChans)
+        self.dense2 = nn.Linear(in_features=midChans, out_features=midChans*dense_features[0]*dense_features[1]*dense_features[2])
+        self.up0 = LinearUpSampling(midChans,outChans)
         
-#     def forward(self, x):
-#         out = self.gn1(x)
-#         out = self.actv1(out)
-#         out = self.conv1(out)
-#         out = out.view(-1, self.num_flat_features(out))
-#         out_vd = self.dense1(out)
-#         distr = out_vd 
-#         out = VDraw(out_vd)
-#         out = self.dense2(out)
-#         out = self.actv2(out)
-#         out = out.view((-1, 128, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
-#         out = self.up0(out)
+    def forward(self, x):
+        out = self.gn1(x)
+        out = self.actv1(out)
+        out = self.conv1(out)
+        out = out.view(-1, self.num_flat_features(out))
+        out_vd = self.dense1(out)
+        distr = out_vd 
+        out = VDraw(out_vd)
+        out = self.dense2(out)
+        out = self.actv2(out)
+        out = out.view((-1, 128, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
+        out = self.up0(out)
         
-#         return out, distr
+        return out, distr
         
-#     def num_flat_features(self, x):
-#         size = x.size()[1:]
-#         num_features = 1
-#         for s in size:
-#             num_features *= s
+    def num_flat_features(self, x):
+        size = x.size()[1:]
+        num_features = 1
+        for s in size:
+            num_features *= s
             
-#         return num_features
+        return num_features
 
-# def VDraw(x):
-#     # Generate a Gaussian distribution with the given mean(128-d) and std(128-d)
-#     return torch.distributions.Normal(x[:,:128], x[:,128:]).sample()
+def VDraw(x):
+    # Generate a Gaussian distribution with the given mean(128-d) and std(128-d)
+    return torch.distributions.Normal(x[:,:128], x[:,128:]).sample()
 
-# class VDecoderBlock(nn.Module):
-#     '''
-#     Variational Decoder block
-#     '''
-#     def __init__(self, inChans, outChans, activation="relu", normalization="group_normalization", mode="trilinear"):
-#         super(VDecoderBlock, self).__init__()
+class VDecoderBlock(nn.Module):
+    '''
+    Variational Decoder block
+    '''
+    def __init__(self, inChans, outChans, activation="relu", normalization="group_normalization", mode="trilinear"):
+        super(VDecoderBlock, self).__init__()
 
-#         self.up0 = LinearUpSampling(inChans, outChans, mode=mode)
-#         self.block = DecoderBlock(outChans, outChans, activation=activation, normalization=normalization)
+        self.up0 = LinearUpSampling(inChans, outChans, mode=mode)
+        self.block = DecoderBlock(outChans, outChans, activation=activation, normalization=normalization)
     
-#     def forward(self, x):
-#         out = self.up0(x)
-#         out = self.block(out)
+    def forward(self, x):
+        out = self.up0(x)
+        out = self.block(out)
 
-#         return out
+        return out
 
 class VAE_ResidualUNetEncoder(nn.Module):
     def __init__(self, input_channels, base_num_features, num_blocks_per_stage, feat_map_mul_on_downscale,
@@ -183,12 +183,12 @@ class VAE_ResidualUNetEncoder(nn.Module):
             # update current_input_features
             current_input_features = current_output_features
         
-        cum_upsample = np.cumprod(np.vstack(self.stage_pool_kernel_size), axis=0).astype(int)
+        # cum_upsample = np.cumprod(np.vstack(self.stage_pool_kernel_size), axis=0).astype(int)
         
-        #add
-        self.dense1 = nn.Linear(base_num_features*cum_upsample, out_features=input_channels)
-        self.dense2 = nn.Linear(in_features=input_channels/2, out_features=cum_upsample)
-        self.up0 = Upsample(input_channels/2, base_num_features, scale_factor=2, mode="trilinear")
+        # #add
+        # self.dense1 = nn.Linear(base_num_features*cum_upsample, out_features=input_channels)
+        # self.dense2 = nn.Linear(in_features=input_channels/2, out_features=cum_upsample)
+        # self.up0 = Upsample(input_channels/2, base_num_features, scale_factor=2, mode="trilinear")
 
         self.stages = nn.ModuleList(self.stages)
 
@@ -202,15 +202,15 @@ class VAE_ResidualUNetEncoder(nn.Module):
         skips = []
 
         # x = self.initial_nonlin(self.initial_norm(self.initial_conv(x)))
-        x = self.initial_nonlin(self.initial_norm(self.initial_conv(x)))
-        x = x.view(-1, self.num_flat_features(x))
-        out_vd = self.dense1(x)
-        distr = out_vd 
-        out = VDraw(out_vd)
-        out = self.dense2(out)
-        out = self.nonlin(out)
+        x = self.nonlin(self.norm1(self.conv1(x)))
+        # x = x.view(-1, self.num_flat_features(x))
+        # out_vd = self.dense1(x)
+        # distr = out_vd 
+        # out = VDraw(out_vd)
+        # out = self.dense2(out)
+        # out = self.nonlin(out)
         # out = out.view((-1, 128, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
-        out = self.up0(out)
+        # out = self.up0(out)
 
 
         for s in self.stages:
@@ -247,17 +247,7 @@ class VAE_ResidualUNetEncoder(nn.Module):
             tmp += num_convs * np.prod(current_shape) * num_feat
         return tmp * batch_size
 
-def num_flat_features(self, x):
-        size = x.size()[1:]
-        num_features = 1
-        for s in size:
-            num_features *= s
-            
-        return num_features
 
-def VDraw(x):
-    # Generate a Gaussian distribution with the given mean(128-d) and std(128-d)
-    return torch.distributions.Normal(x[:,:128], x[:,128:]).sample()
 
 class ResidualUNetDecoder(nn.Module):
     def __init__(self, previous, num_classes, num_blocks_per_stage=None, network_props=None, deep_supervision=False,
@@ -392,22 +382,14 @@ class VAE(nn.Module):
     '''
     Variational Auto-Encoder : to group the features extracted by Encoder
     '''
-    def __init__(self, input_channels, base_num_features, num_blocks_per_stage_encoder, feat_map_mul_on_downscale,
-                 pool_op_kernel_sizes, conv_kernel_sizes, props, num_classes, num_blocks_per_stage_decoder,
-                 deep_supervision=False, upscale_logits=False, max_features=512, initializer=None,
-                 block=BasicResidualBlock):
+    def __init__(self, inChans=256, outChans=4, dense_features=(10,12,8), activation="relu", normalizaiton="group_normalization", mode="trilinear"):
         super(VAE, self).__init__()
 
-        self.conv_op = props['conv_op']
-        self.num_classes = num_classes
-
-        self.encoder = ResidualUNetEncoder(input_channels, base_num_features, num_blocks_per_stage_encoder,
-                                           feat_map_mul_on_downscale, pool_op_kernel_sizes, conv_kernel_sizes,
-                                           props, default_return_skips=True, max_num_features=max_features, block=block)
-        self.decoder = ResidualUNetDecoder(self.encoder, num_classes, num_blocks_per_stage_decoder, props,
-                                           deep_supervision, upscale_logits, block=block)
-        if initializer is not None:
-            self.apply(initializer)
+        self.vd_resample = VDResampling(inChans=inChans, outChans=inChans, dense_features=dense_features)
+        self.vd_block2 = VDecoderBlock(inChans, inChans//2)
+        self.vd_block1 = VDecoderBlock(inChans//2, inChans//4)
+        self.vd_block0 = VDecoderBlock(inChans//4, inChans//8)
+        self.vd_end = nn.Conv3d(inChans//8, outChans, kernel_size=1)
         
     def forward(self, x):
         out, distr = self.vd_resample(x)

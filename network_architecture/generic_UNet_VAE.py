@@ -446,10 +446,10 @@ class VAE(nn.Module):
 
         # out: (B, 320, 5, 14, 8)
         out, distr = self.vd_resample(x)
-        print('OUT1 size',out.size())
+        
         # out: (B, 160, 10, 28, 16)
         out = self.vd_block3(out)
-        print('OUT2 size',out.size())
+        # print('OUT2 size',out.size())
         # out: (B, 80, 20, 56, 32)
         out = self.vd_block2(out)
         print('OUT3 size',out.size())

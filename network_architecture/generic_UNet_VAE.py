@@ -57,7 +57,7 @@ class VDResampling(nn.Module):
     def __init__(self, inChans=256, outChans=256, dense_features=(10,12,8), stride=2, kernel_size=3, padding=1, activation="LeakyReLU", normalization="group_normalization"):
         super(VDResampling, self).__init__()
         
-        midChans = int(inChans / 2)
+        self.midChans = int(inChans / 2)
         self.dense_features = dense_features
         if normalization == "group_normalization":
             self.gn1 = nn.GroupNorm(num_groups=8,num_channels=inChans)
@@ -69,8 +69,8 @@ class VDResampling(nn.Module):
             self.actv2 = nn.LeakyReLU(negative_slope=1e-2, inplace=True)
         self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=16, kernel_size=kernel_size, stride=stride, padding=padding)
         self.dense1 = nn.Linear(in_features=16*dense_features[0]*dense_features[1]*dense_features[2], out_features=inChans)
-        self.dense2 = nn.Linear(in_features=midChans, out_features=midChans*dense_features[0]*dense_features[1]*dense_features[2])
-        self.up0 = LinearUpSampling(midChans,outChans)
+        self.dense2 = nn.Linear(in_features=self.midChans, out_features=self.midChans*dense_features[0]*dense_features[1]*dense_features[2])
+        self.up0 = LinearUpSampling(self.midChans,outChans)
         
     def forward(self, x):
         out = self.gn1(x)
@@ -81,15 +81,25 @@ class VDResampling(nn.Module):
         out = out.view(-1, self.num_flat_features(out))
         print("FLAT SIZE:", out.size())
         out_vd = self.dense1(out)
-        print("DENSE1 SIZE:", out.size())
+        print("DENSE1 SIZE:", out_vd.size())
 
+        # ACTIVATE SIZE: torch.Size([2, 320, 5, 7, 4])
+        # COV SIZE: torch.Size([2, 16, 3, 4, 2])
+        # FLAT SIZE: torch.Size([2, 384])
+        # DENSE1 SIZE: torch.Size([2, 320])
         distr = out_vd 
         out = VDraw(out_vd)
+        print("VDraw SIZE:", out.size())
+
 
         out = self.dense2(out)
+        print("DENSE2 SIZE:", out.size())
         out = self.actv2(out)
-        out = out.view((-1, 128, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
+        print("ACTI2 SIZE:", out.size())
+        out = out.view((-1, midChans, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
+        print("VIEW SIZE:", out.size())
         out = self.up0(out)
+        print("UPSAMPL SIZE:", out.size())
         
         return out, distr
         

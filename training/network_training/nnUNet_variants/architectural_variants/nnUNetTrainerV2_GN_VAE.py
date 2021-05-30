@@ -93,7 +93,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
     
         target = maybe_to_torch(target)
 
-        target = torch.cat((target[0], data), dim=1)
+        target[0] = torch.cat((target[0], data), dim=1)
 
 
         if torch.cuda.is_available():

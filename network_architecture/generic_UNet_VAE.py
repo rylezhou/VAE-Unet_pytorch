@@ -263,7 +263,6 @@ class VAE_ResidualUNetEncoder(nn.Module):
 
         for s in self.stages:
             x = s(x)
-            print('encoder', x.size())
             if self.default_return_skips:
                 skips.append(x)
 
@@ -501,6 +500,7 @@ class Generic_UNet_VAE(Generic_UNet):
         seg_outputs = []
         for d in range(len(self.conv_blocks_context) - 1):
             x = self.conv_blocks_context[d](x)
+            print('encoder', x.size())
             skips.append(x)
             if not self.convolutional_pooling:
                 x = self.td[d](x)

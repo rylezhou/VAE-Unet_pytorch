@@ -90,17 +90,17 @@ class VDResampling(nn.Module):
         # DENSE1 SIZE: torch.Size([2, 320])
         distr = out_vd 
         out = VDraw(out_vd)
-        # print("VDraw SIZE:", out.size())
+        print("VDraw SIZE:", out.size())
 
 
         out = self.dense2(out)
-        # print("DENSE2 SIZE:", out.size())
+        print("DENSE2 SIZE:", out.size())
         out = self.actv2(out)
-        # print("ACTI2 SIZE:", out.size())
+        print("ACTI2 SIZE:", out.size())
         out = out.view((-1, self.midChans, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
-        # print("VIEW SIZE:", out.size())
+        print("VIEW SIZE:", out.size())
         out = self.up0(out)
-        # print("UPSAMPL SIZE:", out.size())
+        print("UPSAMPL SIZE:", out.size())
         
         return out, distr
         
@@ -434,22 +434,31 @@ class VAE(nn.Module):
         super(VAE, self).__init__()
 
         self.vd_resample = VDResampling(inChans=inChans, outChans=inChans, dense_features=dense_features)
-        self.vd_block2 = VDecoderBlock(inChans, inChans//2)
-        self.vd_block1 = VDecoderBlock(inChans//2, inChans//4)
-        self.vd_block0 = VDecoderBlock(inChans//4, inChans//8)
-        self.vd_end = nn.Conv3d(inChans//8, outChans, kernel_size=1)
+        self.vd_block3 = VDecoderBlock(inChans, inChans//2)
+        self.vd_block2 = VDecoderBlock(inChans//2, inChans//4)
+        self.vd_block1 = VDecoderBlock(inChans//4, inChans//8)
+        self.vd_block0 = VDecoderBlock(inChans//8, inChans//16)
+        self.vd_end = nn.Conv3d(inChans//16, outChans, kernel_size=1)
         
     def forward(self, x):
+
+        # out: (B, 320, 5, 14, 8)
         out, distr = self.vd_resample(x)
         print('OUT1 size',out.size())
-        out = self.vd_block2(out)
+        # out: (B, 160, 10, 28, 16)
+        out = self.vd_block3(out)
         print('OUT2 size',out.size())
-        out = self.vd_block1(out)
+        # out: (B, 80, 20, 56, 32)
+        out = self.vd_block2(out)
         print('OUT3 size',out.size())
-        out = self.vd_block0(out)
+        # out: (B, 40, 40, 112, 64)
+        out = self.vd_block1(out)
         print('OUT4 size',out.size())
-        out = self.vd_end(out)
+        # out: (B, 20, 80, 224, 128)
+        out = self.vd_block0(out)
         print('OUT5 size',out.size())
+        # out: (B, 1, 80, 224, 128)
+        out = self.vd_end(out)
 
         return out, distr
 

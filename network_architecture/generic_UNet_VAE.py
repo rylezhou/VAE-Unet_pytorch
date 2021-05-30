@@ -67,7 +67,7 @@ class VDResampling(nn.Module):
         elif activation == "LeakyReLU":
             self.actv1 = nn.LeakyReLU(negative_slope=1e-2, inplace=True)
             self.actv2 = nn.LeakyReLU(negative_slope=1e-2, inplace=True)
-        self.actv_vd = nn.ReLU(inplace=True)
+        self.actv_vd = nn.Sigmoid(inplace=True)
         self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=16, kernel_size=kernel_size, stride=stride, padding=padding)
         self.dense1 = nn.Linear(in_features=16*dense_features[0]*dense_features[1]*dense_features[2], out_features=inChans)
         self.dense2 = nn.Linear(in_features=self.midChans, out_features=self.midChans*dense_features[0]*dense_features[1]*dense_features[2])

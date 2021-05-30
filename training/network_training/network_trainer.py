@@ -117,6 +117,7 @@ class NetworkTrainer(object):
         self.use_progress_bar = False
         if 'nnunet_use_progress_bar' in os.environ.keys():
             self.use_progress_bar = bool(int(os.environ['nnunet_use_progress_bar']))
+        self.use_progress_bar = True
 
         ################# Settings for saving checkpoints ##################################
         self.save_every = 50

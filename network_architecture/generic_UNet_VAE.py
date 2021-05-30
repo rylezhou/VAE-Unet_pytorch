@@ -113,7 +113,8 @@ class VDResampling(nn.Module):
 
 def VDraw(x):
     # Generate a Gaussian distribution with the given mean(128-d) and std(128-d)
-    return torch.distributions.Normal(x[:,:160], x[:,160:]).sample()
+    d = x.size(1) // 2
+    return torch.distributions.Normal(x[:,:d], x[:,d:]).sample()
 
 class VDecoderBlock(nn.Module):
     '''
@@ -135,7 +136,7 @@ class DecoderBlock(nn.Module):
     '''
     Decoder block
     '''
-    def __init__(self, inChans, outChans, stride=1, padding=1, num_groups=8, activation="LeakyReLU", normalization="group_normalization"):
+    def __init__(self, inChans, outChans, stride=1, padding=1, num_groups=8, activation="relu", normalization="group_normalization"):
         super(DecoderBlock, self).__init__()
         
         if normalization == "group_normalization":

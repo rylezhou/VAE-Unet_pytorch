@@ -54,11 +54,12 @@ class VDResampling(nn.Module):
     '''
     Variational Auto-Encoder Resampling block
     '''
-    def __init__(self, inChans=256, outChans=256, dense_features=(10,12,8), stride=2, kernel_size=3, padding=1, activation="LeakyReLU", normalization="group_normalization"):
+    def __init__(self, inChans=256, outChans=256, in_dense_features=(3,4,2), out_dense_features=(5,14,8), stride=2, kernel_size=3, padding=1, activation="LeakyReLU", normalization="group_normalization"):
         super(VDResampling, self).__init__()
         
         self.midChans = int(inChans / 2)
-        self.dense_features = dense_features
+        self.in_dense_features = in_dense_features
+        self.out_dense_features = out_dense_features
         if normalization == "group_normalization":
             self.gn1 = nn.GroupNorm(num_groups=8,num_channels=inChans)
         if activation == "relu":
@@ -69,9 +70,8 @@ class VDResampling(nn.Module):
             self.actv2 = nn.LeakyReLU(negative_slope=1e-2, inplace=True)
         self.actv_vd = nn.Sigmoid()
         self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=16, kernel_size=kernel_size, stride=stride, padding=padding)
-        self.dense1 = nn.Linear(in_features=16*dense_features[0]*dense_features[1]*dense_features[2], out_features=inChans)
-        self.dense2 = nn.Linear(in_features=self.midChans, out_features=self.midChans*dense_features[0]*dense_features[1]*dense_features[2])
-        self.up0 = LinearUpSampling(self.midChans,outChans)
+        self.dense1 = nn.Linear(in_features=16*in_dense_features[0]*in_dense_features[1]*in_dense_features[2], out_features=inChans)
+        self.dense2 = nn.Linear(in_features=self.midChans, out_features=self.inChans*out_dense_features[0]*out_dense_features[1]*out_dense_features[2])
         
     def forward(self, x):
         out = self.gn1(x)
@@ -92,15 +92,17 @@ class VDResampling(nn.Module):
         out = VDraw(out_vd)
         print("VDraw SIZE:", out.size())
 
-
+    #     VDraw SIZE: torch.Size([2, 160])
+    # DENSE2 SIZE: torch.Size([2, 3840])  match [2, 5,14,8]
+    # ACTI2 SIZE: torch.Size([2, 3840])
+    # VIEW SIZE: torch.Size([2, 160, 3, 4, 2])
+    # UPSAMPL SIZE: torch.Size([2, 320, 6, 8, 4])
         out = self.dense2(out)
         print("DENSE2 SIZE:", out.size())
         out = self.actv2(out)
         print("ACTI2 SIZE:", out.size())
-        out = out.view((-1, self.midChans, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
+        out = out.view((-1, self.inChans, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
         print("VIEW SIZE:", out.size())
-        out = self.up0(out)
-        print("UPSAMPL SIZE:", out.size())
         
         return out, distr
         

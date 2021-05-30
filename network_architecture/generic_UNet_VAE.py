@@ -115,6 +115,47 @@ class VDecoderBlock(nn.Module):
 
         return out
 
+class DecoderBlock(nn.Module):
+    '''
+    Decoder block
+    '''
+    def __init__(self, inChans, outChans, stride=1, padding=1, num_groups=8, activation="relu", normalizaiton="group_normalization"):
+        super(DecoderBlock, self).__init__()
+        
+        if normalizaiton == "group_normalization":
+            self.norm1 = nn.GroupNorm(num_groups=num_groups, num_channels=outChans)
+            self.norm2 = nn.GroupNorm(num_groups=num_groups, num_channels=outChans)
+        else:
+            self.norm1 = None
+            self.norm2 = None
+        if activation == "relu":
+            self.actv1 = nn.ReLU(inplace=True)
+            self.actv2 = nn.ReLU(inplace=True)
+        elif activation == "elu":
+            self.actv1 = nn.ELU(inplace=True)
+            self.actv2 = nn.ELU(inplace=True)            
+        self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=outChans, kernel_size=3, stride=stride, padding=padding)
+        self.conv2 = nn.Conv3d(in_channels=outChans, out_channels=outChans, kernel_size=3, stride=stride, padding=padding)
+        
+        
+    def forward(self, x):
+        residual = x
+        
+        out = x
+        
+        if self.norm1:
+            out = self.norm1(out)
+        out = self.actv1(out)
+        out = self.conv1(out)
+        if self.norm2:
+            out = self.norm2(out)
+        out = self.actv2(out)
+        out = self.conv2(out)
+        
+        out += residual
+        
+        return out
+
 class VAE_ResidualUNetEncoder(nn.Module):
     def __init__(self, input_channels, base_num_features, num_blocks_per_stage, feat_map_mul_on_downscale,
                  pool_op_kernel_sizes, conv_kernel_sizes, props, default_return_skips=True,

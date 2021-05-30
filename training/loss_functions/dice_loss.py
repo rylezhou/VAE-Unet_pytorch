@@ -478,9 +478,9 @@ class DC_and_CE_KL_Loss(nn.Module):
         net_output, vae_pred, vae_distr = net_output
         target, vae_truth = target
 
-        print('net_output size',net_output.size())
-        print('vae_pred size',vae_pred.size())
-        print('vae_distr size',vae_distr.size())
+        # print('net_output size',net_output.size())
+        # print('vae_pred size',vae_pred.size())
+        # print('vae_distr size',vae_distr.size())
 
         dc_loss = self.dc(net_output, target, loss_mask=mask) if self.weight_dice != 0 else 0
         if self.log_dice:

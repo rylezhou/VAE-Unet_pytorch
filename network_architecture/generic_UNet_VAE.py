@@ -54,7 +54,7 @@ class VDResampling(nn.Module):
     '''
     Variational Auto-Encoder Resampling block
     '''
-    def __init__(self, inChans=256, outChans=256, dense_features=(10,12,8), stride=2, kernel_size=3, padding=1, activation="LeakyReLU", normalization="group_normalization"):
+    def __init__(self, inChans=256, outChans=256, dense_features=(10,12,8), stride=2, kernel_size=3, padding=1, activation="relu", normalization="group_normalization"):
         super(VDResampling, self).__init__()
         
         self.midChans = int(inChans / 2)
@@ -136,7 +136,7 @@ class DecoderBlock(nn.Module):
     '''
     Decoder block
     '''
-    def __init__(self, inChans, outChans, stride=1, padding=1, num_groups=8, activation="relu", normalization="group_normalization"):
+    def __init__(self, inChans, outChans, stride=1, padding=1, num_groups=8, activation="LeakyReLU", normalization="group_normalization"):
         super(DecoderBlock, self).__init__()
         
         if normalization == "group_normalization":

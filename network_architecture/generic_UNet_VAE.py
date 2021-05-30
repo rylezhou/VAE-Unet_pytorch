@@ -107,7 +107,7 @@ class VDecoderBlock(nn.Module):
         super(VDecoderBlock, self).__init__()
 
         self.up0 = LinearUpSampling(inChans, outChans, mode=mode)
-        self.block = DecoderBlock(outChans, outChans, activation="LeakyReLU", normalization="group_normalization")
+        self.block = DecoderBlock(outChans, outChans, activation=activation, normalization=normalization)
     
     def forward(self, x):
         out = self.up0(x)
@@ -119,10 +119,10 @@ class DecoderBlock(nn.Module):
     '''
     Decoder block
     '''
-    def __init__(self, inChans, outChans, stride=1, padding=1, num_groups=8, activation="LeakyReLU", normalizaiton="group_normalization"):
+    def __init__(self, inChans, outChans, stride=1, padding=1, num_groups=8, activation="LeakyReLU", normalization="group_normalization"):
         super(DecoderBlock, self).__init__()
         
-        if normalizaiton == "group_normalization":
+        if normalization == "group_normalization":
             self.norm1 = nn.GroupNorm(num_groups=num_groups, num_channels=outChans)
             self.norm2 = nn.GroupNorm(num_groups=num_groups, num_channels=outChans)
         else:

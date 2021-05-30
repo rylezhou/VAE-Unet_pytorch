@@ -97,7 +97,7 @@ class VDResampling(nn.Module):
         print("DENSE2 SIZE:", out.size())
         out = self.actv2(out)
         print("ACTI2 SIZE:", out.size())
-        out = out.view((-1, midChans, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
+        out = out.view((-1, self.midChans, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
         print("VIEW SIZE:", out.size())
         out = self.up0(out)
         print("UPSAMPL SIZE:", out.size())

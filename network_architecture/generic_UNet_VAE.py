@@ -81,9 +81,11 @@ class VDResampling(nn.Module):
         out = out.view(-1, self.num_flat_features(out))
         print("FLAT SIZE:", out.size())
         out_vd = self.dense1(out)
+        print("DENSE1 SIZE:", out.size())
 
         distr = out_vd 
         out = VDraw(out_vd)
+
         out = self.dense2(out)
         out = self.actv2(out)
         out = out.view((-1, 128, self.dense_features[0],self.dense_features[1],self.dense_features[2]))
@@ -101,7 +103,7 @@ class VDResampling(nn.Module):
 
 def VDraw(x):
     # Generate a Gaussian distribution with the given mean(128-d) and std(128-d)
-    return torch.distributions.Normal(x[:,:128], x[:,128:]).sample()
+    return torch.distributions.Normal(x[:,:160], x[:,160:]).sample()
 
 class VDecoderBlock(nn.Module):
     '''

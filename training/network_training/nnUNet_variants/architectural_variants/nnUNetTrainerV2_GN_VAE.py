@@ -84,8 +84,8 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         :return:
         """
         data_dict = next(data_generator)
-        data = data_dict['data']
-        target = data_dict['target']
+        data = data_dict['data'] ## input
+        target = data_dict['target'] ##seg target
         # print([t.shape for t in target])
       
 
@@ -93,7 +93,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
     
         target = maybe_to_torch(target)
 
-        target[0] = torch.cat((target[0], data), dim=1)
+        target = tuple([(t, data) for t in target])
 
 
         if torch.cuda.is_available():

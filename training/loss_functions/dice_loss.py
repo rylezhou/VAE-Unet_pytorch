@@ -475,8 +475,8 @@ class DC_and_CE_KL_Loss(nn.Module):
         else:
             mask = None
 
-        net_output, vae_outputs, vae_distr = net_output
-        print('net_output, len',len(net_output))
+        net_output, vae_pred, vae_distr = net_output
+        target, vae_truth = target
 
         dc_loss = self.dc(net_output, target, loss_mask=mask) if self.weight_dice != 0 else 0
         if self.log_dice:
@@ -489,7 +489,7 @@ class DC_and_CE_KL_Loss(nn.Module):
 
         vae_distr_dim = vae_distr.size(1)
         est_mean, est_std = (vae_distr[:, :vae_distr_dim//2], vae_distr[:, vae_distr_dim//2:])
-        vae_pred, vae_truth = (vae_outputs, target[:,1:,:,:,:])
+
         l2_loss = self.l2_loss(vae_pred, vae_truth)
         kl_div = self.kl_loss(est_mean, est_std)
 

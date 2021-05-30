@@ -522,7 +522,8 @@ class Generic_UNet_VAE(Generic_UNet):
             seg_outputs.append(self.final_nonlin(self.seg_outputs[u](x)))
         
         if self._deep_supervision and self.do_ds:
-            return tuple([seg_outputs[-1]] + [i(j) for i, j in
-                                              zip(list(self.upscale_logits_ops)[::-1], seg_outputs[:-1][::-1])]), vae_outputs, vae_distr
+            ds_outputs = tuple([seg_outputs[-1]] + [i(j) for i, j in
+                                              zip(list(self.upscale_logits_ops)[::-1], seg_outputs[:-1][::-1])])
+            return tuple([(ds_out, vae_outputs, vae_distr) for ds_out in ds_outputs])
         else:
             return seg_outputs[-1], vae_outputs, vae_distr

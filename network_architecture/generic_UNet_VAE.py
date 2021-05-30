@@ -71,7 +71,7 @@ class VDResampling(nn.Module):
         self.actv_vd = nn.Sigmoid()
         self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=16, kernel_size=kernel_size, stride=stride, padding=padding)
         self.dense1 = nn.Linear(in_features=16*in_dense_features[0]*in_dense_features[1]*in_dense_features[2], out_features=inChans)
-        self.dense2 = nn.Linear(in_features=self.midChans, out_features=self.inChans*out_dense_features[0]*out_dense_features[1]*out_dense_features[2])
+        self.dense2 = nn.Linear(in_features=self.midChans, out_features=inChans*out_dense_features[0]*out_dense_features[1]*out_dense_features[2])
         
     def forward(self, x):
         out = self.gn1(x)

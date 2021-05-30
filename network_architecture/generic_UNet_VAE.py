@@ -437,10 +437,10 @@ class VAE(nn.Module):
         super(VAE, self).__init__()
 
         self.vd_resample = VDResampling(inChans=inChans, outChans=inChans)
-        self.vd_block3 = VDecoderBlock(inChans, inChans//2)
-        self.vd_block2 = VDecoderBlock(inChans//2, inChans//4)
-        self.vd_block1 = VDecoderBlock(inChans//4, inChans//8)
-        self.vd_block0 = VDecoderBlock(inChans//8, inChans//16)
+        self.vd_block3 = VDecoderBlock(inChans, inChans//2, num_groups=10)
+        self.vd_block2 = VDecoderBlock(inChans//2, inChans//4, num_groups=10)
+        self.vd_block1 = VDecoderBlock(inChans//4, inChans//8, num_groups=10)
+        self.vd_block0 = VDecoderBlock(inChans//8, inChans//16, num_groups=10)
         self.vd_end = nn.Conv3d(inChans//16, outChans, kernel_size=1)
         
     def forward(self, x):

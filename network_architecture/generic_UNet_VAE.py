@@ -58,6 +58,7 @@ class VDResampling(nn.Module):
         super(VDResampling, self).__init__()
         
         self.midChans = int(inChans / 2)
+        self.inChans = inChans
         self.in_dense_features = in_dense_features
         self.out_dense_features = out_dense_features
         if normalization == "group_normalization":

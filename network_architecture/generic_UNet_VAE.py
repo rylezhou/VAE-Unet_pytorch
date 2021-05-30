@@ -432,10 +432,10 @@ class VAE(nn.Module):
     '''
     Variational Auto-Encoder : to group the features extracted by Encoder
     '''
-    def __init__(self, inChans=256, outChans=4, dense_features=(10,12,8), activation="relu", normalizaiton="group_normalization", mode="trilinear"):
+    def __init__(self, inChans=256, outChans=4,activation="relu", normalization="group_normalization", mode="trilinear"):
         super(VAE, self).__init__()
 
-        self.vd_resample = VDResampling(inChans=inChans, outChans=inChans, dense_features=dense_features)
+        self.vd_resample = VDResampling(inChans=inChans, outChans=inChans)
         self.vd_block3 = VDecoderBlock(inChans, inChans//2)
         self.vd_block2 = VDecoderBlock(inChans//2, inChans//4)
         self.vd_block1 = VDecoderBlock(inChans//4, inChans//8)
@@ -497,7 +497,7 @@ class Generic_UNet_VAE(Generic_UNet):
                  seg_output_use_bias)
 
         # Variational Auto-Encoder
-        self.vae = VAE(320, outChans=input_channels, dense_features=(3, 4, 2))
+        self.vae = VAE(320, outChans=input_channels)
     
     def forward(self, x):
 

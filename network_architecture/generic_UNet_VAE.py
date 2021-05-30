@@ -54,7 +54,7 @@ class VDResampling(nn.Module):
     '''
     Variational Auto-Encoder Resampling block
     '''
-    def __init__(self, inChans=256, outChans=256, dense_features=(10,12,8), stride=2, kernel_size=3, padding=1, activation="relu", normalization="group_normalization"):
+    def __init__(self, inChans=256, outChans=256, dense_features=(10,12,8), stride=2, kernel_size=3, padding=1, activation="LeakyReLU", normalization="group_normalization"):
         super(VDResampling, self).__init__()
         
         self.midChans = int(inChans / 2)
@@ -67,6 +67,7 @@ class VDResampling(nn.Module):
         elif activation == "LeakyReLU":
             self.actv1 = nn.LeakyReLU(negative_slope=1e-2, inplace=True)
             self.actv2 = nn.LeakyReLU(negative_slope=1e-2, inplace=True)
+        self.actv_vd = nn.ReLU(inplace=True)
         self.conv1 = nn.Conv3d(in_channels=inChans, out_channels=16, kernel_size=kernel_size, stride=stride, padding=padding)
         self.dense1 = nn.Linear(in_features=16*dense_features[0]*dense_features[1]*dense_features[2], out_features=inChans)
         self.dense2 = nn.Linear(in_features=self.midChans, out_features=self.midChans*dense_features[0]*dense_features[1]*dense_features[2])
@@ -82,7 +83,7 @@ class VDResampling(nn.Module):
         print("FLAT SIZE:", out.size())
         out_vd = self.dense1(out)
         print("DENSE1 SIZE:", out_vd.size())
-
+        out_vd = self.actv_vd(out_vd)
         # ACTIVATE SIZE: torch.Size([2, 320, 5, 7, 4])
         # COV SIZE: torch.Size([2, 16, 3, 4, 2])
         # FLAT SIZE: torch.Size([2, 384])

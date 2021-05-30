@@ -106,7 +106,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
             with autocast():
                 output = self.network(data)
                 del data
-                l = self.loss(output, target)
+                l = self.loss([output], target)
 
             if do_backprop:
                 self.amp_grad_scaler.scale(l).backward()
@@ -117,7 +117,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         else:
             output = self.network(data)
             del data
-            l = self.loss(output, target)
+            l = self.loss([output], target)
 
             if do_backprop:
                 l.backward()

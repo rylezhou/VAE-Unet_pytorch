@@ -130,3 +130,10 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         del target
 
         return l.detach().cpu().numpy()
+
+    def run_online_evaluation(self, output, target):
+        """
+        """
+        output = [o[0] for o in output]
+        target = [t[0] for t in target]
+        return super().run_online_evaluation(output, target)

@@ -14,7 +14,6 @@
 import torch
 import numpy as np
 from network_architecture.generic_UNet_VAE import Generic_UNet_VAE
-# from network_architecture.generic_modular_residual_UNet import Generic_UNet
 from network_architecture.initialization import InitWeights_He
 from training.network_training.nnUNetTrainerV2 import nnUNetTrainerV2
 from network_architecture.custom_modules.helperModules import MyGroupNorm
@@ -23,20 +22,10 @@ from torch import nn
 from training.loss_functions.dice_loss import DC_and_CE_KL_Loss
 
 from utilities.to_torch import maybe_to_torch, to_cuda
-# from network_architecture.generic_UNet import Generic_UNet
-# from network_architecture.initialization import InitWeights_He
-# from network_architecture.neural_network import SegmentationNetwork
-# from training.data_augmentation.default_data_augmentation import default_2D_augmentation_params, \
-#     get_patch_size, default_3D_augmentation_params
-# from training.dataloading.dataset_loading import unpack_dataset
-# from training.network_training.nnUNetTrainer import nnUNetTrainer
-# from utilities.nd_softmax import softmax_helper
-# from sklearn.model_selection import KFold
-# from torch import nn
 from torch.cuda.amp import autocast
 
-INIT_WEIGHT = 1e-5
-# INIT_WEIGHT = 1e-2
+# INIT_WEIGHT = 1e-5
+INIT_WEIGHT = 1e-2
 class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
 
     def __init__(self, plans_file, fold, output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
@@ -93,7 +82,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
     
         target = maybe_to_torch(target)
 
-        target = [[t, data] for t in target]
+        target = [[t, data] for t in target] ## now target has vae 
 
 
         if torch.cuda.is_available():
@@ -131,9 +120,34 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
 
         return l.detach().cpu().numpy()
 
-    def run_online_evaluation(self, output, target):
+    def run_online_evaluation(self, output, target):  ## add this for vae
         """
         """
         output = [o[0] for o in output]
         target = [t[0] for t in target]
         return super().run_online_evaluation(output, target)
+
+    def predict_preprocessed_data_return_seg_and_softmax(self, data: np.ndarray, do_mirroring: bool = True,
+                                                         mirror_axes: Tuple[int] = None,
+                                                         use_sliding_window: bool = True, step_size: float = 0.5,
+                                                         use_gaussian: bool = True, pad_border_mode: str = 'constant',
+                                                         pad_kwargs: dict = None, all_in_gpu: bool = False,
+                                                         verbose: bool = True, mixed_precision=True) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        We need to wrap this because we need to enforce self.network.do_ds = False for prediction
+        """
+        ds = self.network.do_ds
+        self.network.do_ds = False
+        # data = self.data[1]
+        print(data.shape)
+        ret = super().predict_preprocessed_data_return_seg_and_softmax(data,
+                                                                       do_mirroring=do_mirroring,
+                                                                       mirror_axes=mirror_axes,
+                                                                       use_sliding_window=use_sliding_window,
+                                                                       step_size=step_size, use_gaussian=use_gaussian,
+                                                                       pad_border_mode=pad_border_mode,
+                                                                       pad_kwargs=pad_kwargs, all_in_gpu=all_in_gpu,
+                                                                       verbose=verbose,
+                                                                       mixed_precision=mixed_precision)
+        self.network.do_ds = ds
+        return ret

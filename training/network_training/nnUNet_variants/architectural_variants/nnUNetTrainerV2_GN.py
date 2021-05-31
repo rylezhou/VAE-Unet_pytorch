@@ -48,3 +48,28 @@ class nnUNetTrainerV2_GN(nnUNetTrainerV2):
         if torch.cuda.is_available():
             self.network.cuda()
         self.network.inference_apply_nonlin = softmax_helper
+
+    def predict_preprocessed_data_return_seg_and_softmax(self, data: np.ndarray, do_mirroring: bool = True,
+                                                         mirror_axes: Tuple[int] = None,
+                                                         use_sliding_window: bool = True, step_size: float = 0.5,
+                                                         use_gaussian: bool = True, pad_border_mode: str = 'constant',
+                                                         pad_kwargs: dict = None, all_in_gpu: bool = False,
+                                                         verbose: bool = True, mixed_precision=True) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        We need to wrap this because we need to enforce self.network.do_ds = False for prediction
+        """
+        ds = self.network.do_ds
+        self.network.do_ds = False
+        # data = self.data[1]
+        print("DATA SHAPE",data.shape)
+        ret = super().predict_preprocessed_data_return_seg_and_softmax(data,
+                                                                       do_mirroring=do_mirroring,
+                                                                       mirror_axes=mirror_axes,
+                                                                       use_sliding_window=use_sliding_window,
+                                                                       step_size=step_size, use_gaussian=use_gaussian,
+                                                                       pad_border_mode=pad_border_mode,
+                                                                       pad_kwargs=pad_kwargs, all_in_gpu=all_in_gpu,
+                                                                       verbose=verbose,
+                                                                       mixed_precision=mixed_precision)
+        self.network.do_ds = ds
+        return ret

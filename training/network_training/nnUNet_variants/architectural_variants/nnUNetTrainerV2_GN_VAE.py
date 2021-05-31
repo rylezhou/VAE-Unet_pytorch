@@ -145,7 +145,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         # data = self.data[1]
         #(1, 512, 780, 144)
         print("DATA SHAPE",data.shape)
-        ret = super().predict_preprocessed_data_return_seg_and_softmax(data[:-1],
+        ret = super().predict_preprocessed_data_return_seg_and_softmax(data,
                                                                        do_mirroring=do_mirroring,
                                                                        mirror_axes=mirror_axes,
                                                                        use_sliding_window=use_sliding_window,

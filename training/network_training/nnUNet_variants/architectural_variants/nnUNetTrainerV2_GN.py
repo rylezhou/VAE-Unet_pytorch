@@ -19,7 +19,7 @@ from network_architecture.custom_modules.helperModules import MyGroupNorm
 from utilities.nd_softmax import softmax_helper
 from torch import nn
 import numpy as np
-
+from typing import Tuple
 
 
 class nnUNetTrainerV2_GN(nnUNetTrainerV2):

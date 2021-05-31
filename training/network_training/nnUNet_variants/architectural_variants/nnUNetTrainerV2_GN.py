@@ -18,6 +18,8 @@ from training.network_training.nnUNetTrainerV2 import nnUNetTrainerV2
 from network_architecture.custom_modules.helperModules import MyGroupNorm
 from utilities.nd_softmax import softmax_helper
 from torch import nn
+import numpy as np
+
 
 
 class nnUNetTrainerV2_GN(nnUNetTrainerV2):

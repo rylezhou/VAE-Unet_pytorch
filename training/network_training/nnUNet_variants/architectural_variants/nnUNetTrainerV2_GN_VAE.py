@@ -140,7 +140,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         ds = self.network.do_ds
         self.network.do_ds = False
         # data = self.data[1]
-        print(data.shape)
+        print("DATA SHAPE",data.shape)
         ret = super().predict_preprocessed_data_return_seg_and_softmax(data,
                                                                        do_mirroring=do_mirroring,
                                                                        mirror_axes=mirror_axes,

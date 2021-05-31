@@ -23,6 +23,7 @@ from training.loss_functions.dice_loss import DC_and_CE_KL_Loss
 
 from utilities.to_torch import maybe_to_torch, to_cuda
 from torch.cuda.amp import autocast
+from typing import Tuple
 
 # INIT_WEIGHT = 1e-5
 INIT_WEIGHT = 1e-2

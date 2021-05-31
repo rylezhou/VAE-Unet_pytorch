@@ -24,6 +24,9 @@ from training.loss_functions.dice_loss import DC_and_CE_KL_Loss
 from utilities.to_torch import maybe_to_torch, to_cuda
 from torch.cuda.amp import autocast
 from typing import Tuple
+from typing import Union, Tuple, List
+
+from torch.cuda.amp import autocast
 
 # INIT_WEIGHT = 1e-5
 INIT_WEIGHT = 1e-2
@@ -140,8 +143,9 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         ds = self.network.do_ds
         self.network.do_ds = False
         # data = self.data[1]
+        #(1, 512, 780, 144)
         print("DATA SHAPE",data.shape)
-        ret = super().predict_preprocessed_data_return_seg_and_softmax(data,
+        ret = super().predict_preprocessed_data_return_seg_and_softmax(data[:-1],
                                                                        do_mirroring=do_mirroring,
                                                                        mirror_axes=mirror_axes,
                                                                        use_sliding_window=use_sliding_window,
@@ -152,3 +156,63 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
                                                                        mixed_precision=mixed_precision)
         self.network.do_ds = ds
         return ret
+    
+
+    def _internal_maybe_mirror_and_pred_3D(self, x: Union[np.ndarray, torch.tensor], mirror_axes: tuple,
+                                           do_mirroring: bool = True,
+                                           mult: np.ndarray or torch.tensor = None) -> torch.tensor:
+        assert len(x.shape) == 5, 'x must be (b, c, x, y, z)'
+        # everything in here takes place on the GPU. If x and mult are not yet on GPU this will be taken care of here
+        # we now return a cuda tensor! Not numpy array!
+
+        x = to_cuda(maybe_to_torch(x), gpu_id=self.get_device())
+        result_torch = torch.zeros([1, self.num_classes] + list(x.shape[2:]),
+                                   dtype=torch.float).cuda(self.get_device(), non_blocking=True)
+
+        if mult is not None:
+            mult = to_cuda(maybe_to_torch(mult), gpu_id=self.get_device())
+
+        if do_mirroring:
+            mirror_idx = 8
+            num_results = 2 ** len(mirror_axes)
+        else:
+            mirror_idx = 1
+            num_results = 1
+
+        for m in range(mirror_idx):
+            if m == 0:
+                pred = self.inference_apply_nonlin(self(x))
+                result_torch += 1 / num_results * pred
+
+            if m == 1 and (2 in mirror_axes):
+                pred = self.inference_apply_nonlin(self(torch.flip(x, (4, ))))
+                result_torch += 1 / num_results * torch.flip(pred, (4,))
+
+            if m == 2 and (1 in mirror_axes):
+                pred = self.inference_apply_nonlin(self(torch.flip(x, (3, ))))
+                result_torch += 1 / num_results * torch.flip(pred, (3,))
+
+            if m == 3 and (2 in mirror_axes) and (1 in mirror_axes):
+                pred = self.inference_apply_nonlin(self(torch.flip(x, (4, 3))))
+                result_torch += 1 / num_results * torch.flip(pred, (4, 3))
+
+            if m == 4 and (0 in mirror_axes):
+                pred = self.inference_apply_nonlin(self(torch.flip(x, (2, ))))
+                result_torch += 1 / num_results * torch.flip(pred, (2,))
+
+            if m == 5 and (0 in mirror_axes) and (2 in mirror_axes):
+                pred = self.inference_apply_nonlin(self(torch.flip(x, (4, 2))))
+                result_torch += 1 / num_results * torch.flip(pred, (4, 2))
+
+            if m == 6 and (0 in mirror_axes) and (1 in mirror_axes):
+                pred = self.inference_apply_nonlin(self(torch.flip(x, (3, 2))))
+                result_torch += 1 / num_results * torch.flip(pred, (3, 2))
+
+            if m == 7 and (0 in mirror_axes) and (1 in mirror_axes) and (2 in mirror_axes):
+                pred = self.inference_apply_nonlin(self(torch.flip(x, (4, 3, 2))))
+                result_torch += 1 / num_results * torch.flip(pred, (4, 3, 2))
+
+        if mult is not None:
+            result_torch[:, :] *= mult
+
+        return result_torch

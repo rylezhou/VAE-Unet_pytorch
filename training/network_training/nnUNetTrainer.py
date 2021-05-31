@@ -589,6 +589,7 @@ class nnUNetTrainer(NetworkTrainer):
             if overwrite or (not isfile(join(output_folder, fname + ".nii.gz"))) or \
                     (save_softmax and not isfile(join(output_folder, fname + ".npz"))):
                 data = np.load(self.dataset[k]['data_file'])['data']
+                print("Data Shape", data.shape)
 
                 print(k, data.shape)
                 data[-1][data[-1] == -1] = 0

@@ -427,12 +427,12 @@ class DC_and_topk_loss(nn.Module):
 
 
 class DC_and_CE_KL_Loss(nn.Module):
-    def __init__(self, soft_dice_kwargs, ce_kwargs, aggregate="sum", square_dice=False, weight_ce=1, weight_dice=1,weight_kl=0.3, weight_mse=0.3,
+    def __init__(self, soft_dice_kwargs, ce_kwargs, aggregate="sum", square_dice=False, weight_ce=1, weight_dice=1,weight_kl=0.5, weight_mse=0.5,
                  log_dice=False, ignore_label=None):
         """
         CAREFUL. Weights for CE and Dice do not need to sum to one. You can set whatever you want.
         :param soft_dice_kwargs:
-        :param ce_kwargs:
+        :param ce_kwargs: 
         :param aggregate:
         :param square_dice:
         :param weight_ce:

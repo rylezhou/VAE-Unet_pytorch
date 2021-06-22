@@ -20,6 +20,8 @@ def haha(x):
     # print(x)
     print(type(x))
     print(len(x))
+    for i in x:
+        print(type(i))
     F.softmax(x, 1)
 softmax_helper = lambda x: haha(x)
 

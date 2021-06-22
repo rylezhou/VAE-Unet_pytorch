@@ -17,8 +17,9 @@ from torch import nn
 import torch.nn.functional as F
 
 def haha(x):
-    print(x)
+    # print(x)
     print(type(x))
+    print(len(x))
     F.softmax(x, 1)
 softmax_helper = lambda x: haha(x)
 

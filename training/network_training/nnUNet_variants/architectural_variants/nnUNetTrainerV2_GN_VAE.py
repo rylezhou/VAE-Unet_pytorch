@@ -77,8 +77,9 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         :return:
         """
         data_dict = next(data_generator)
+        ## DEBUG:([2, 1, 80, 224, 128])
         data = data_dict['data'] ## input
-        print("INPUT_SHAPE",data.shape)
+        # print("INPUT_SHAPE",data.shape)
         target = data_dict['target'] ##seg target
         # print([t.shape for t in target])
       

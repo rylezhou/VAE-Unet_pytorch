@@ -597,7 +597,7 @@ class nnUNetTrainer(NetworkTrainer):
                 print(k, data.shape)
                 # data[-1][data[-1] == -1] = 0
 
-                softmax_pred = self.predict_preprocessed_data_return_seg_and_softmax(data[:-1],
+                softmax_pred = self.predict_preprocessed_data_return_seg_and_softmax(data,
                                                                                      do_mirroring=do_mirroring,
                                                                                      mirror_axes=mirror_axes,
                                                                                      use_sliding_window=use_sliding_window,

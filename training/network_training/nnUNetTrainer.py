@@ -39,6 +39,7 @@ from utilities.nd_softmax import softmax_helper
 from utilities.tensor_utilities import sum_tensor
 from torch import nn
 from torch.optim import lr_scheduler
+from utilities.to_torch import maybe_to_torch, to_cuda
 
 
 matplotlib.use("agg")
@@ -521,7 +522,7 @@ class nnUNetTrainer(NetworkTrainer):
         #                               use_gaussian=use_gaussian, pad_border_mode=pad_border_mode,
         #                               pad_kwargs=pad_kwargs, all_in_gpu=all_in_gpu, verbose=verbose,
         #                               mixed_precision=mixed_precision)
-        data = torch.tensor(data)
+        data = maybe_to_torch(data)
         ret = self.network(data)
         self.network.train(current_mode)
         return ret

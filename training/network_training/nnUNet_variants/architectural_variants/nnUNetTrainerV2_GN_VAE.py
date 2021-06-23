@@ -78,6 +78,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         """
         data_dict = next(data_generator)
         data = data_dict['data'] ## input
+        print("INPUT_SHAPE",data.shape)
         target = data_dict['target'] ##seg target
         # print([t.shape for t in target])
       
@@ -217,3 +218,24 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
             result_torch[:, :] *= mult
 
         return result_torch
+
+
+    def validate(self, do_mirroring: bool = True, use_sliding_window: bool = True,
+                 step_size: float = 0.5, save_softmax: bool = True, use_gaussian: bool = True, overwrite: bool = True,
+                 validation_folder_name: str = 'validation_raw', debug: bool = False, all_in_gpu: bool = False,
+                 segmentation_export_kwargs: dict = None, run_postprocessing_on_folds: bool = True):
+        """
+        We need to wrap this because we need to enforce self.network.do_ds = False for prediction
+        """
+        ds = self.network.do_ds
+        self.network.do_ds = False
+        ret = super().validate(do_mirroring=do_mirroring, use_sliding_window=use_sliding_window, step_size=step_size,
+                               save_softmax=save_softmax, use_gaussian=use_gaussian,
+                               overwrite=overwrite, validation_folder_name=validation_folder_name, debug=debug,
+                               all_in_gpu=all_in_gpu, segmentation_export_kwargs=segmentation_export_kwargs,
+                               run_postprocessing_on_folds=run_postprocessing_on_folds)
+
+        self.network.do_ds = ds
+        return ret   
+
+    

@@ -523,7 +523,7 @@ class SegmentationNetwork(NeuralNetwork):
                 # print("type::::",type(x))
             
                 network_output = self(x)
-                print("ttttttttttt",[t.shape for t in x])
+                print("ttttttttttt",[type(t) for t in x])
                 network_output, vae_pred, vae_distr = network_output
                 pred = self.inference_apply_nonlin(network_output)
 

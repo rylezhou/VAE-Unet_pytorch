@@ -171,6 +171,8 @@ def main():
     data = maybe_to_torch(data)
     if torch.cuda.is_available():
             data = to_cuda(data)
+
+    trainer.network.eval()
     output = trainer.network(data)
 
     # if find_lr:

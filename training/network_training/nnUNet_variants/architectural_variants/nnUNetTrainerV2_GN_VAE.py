@@ -77,9 +77,10 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
         :return:
         """
         data_dict = next(data_generator)
-        # data = data_dict['data'] ## input
-        data = np.random.rand(2,1,512, 780, 172)
+        data = data_dict['data'] ## input
+        # data = np.random.rand(2,1,512, 780, 172)
         target = data_dict['target'] ##seg target
+        print("******target_shape", target.shape)
         # print([t.shape for t in target])
       
 

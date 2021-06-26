@@ -522,7 +522,7 @@ class SegmentationNetwork(NeuralNetwork):
             if m == 0:
                 # print("type::::",type(x))
                 network_output = self(x)
-                network_output = network_output[0]
+                network_output = network_output[0][0]
                 pred = self.inference_apply_nonlin(network_output)
 
                 result_torch += 1 / num_results * pred

@@ -163,7 +163,9 @@ def main():
 
     trainer.initialize(not validation_only)
     import numpy as np
+    import torch
     data = np.random.rand(2,1,512, 780, 172)
+    data = torch.tensor(data)
     output = trainer.network(data)
 
     # if find_lr:

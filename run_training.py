@@ -25,6 +25,7 @@ from training.network_training.nnUNetTrainerV2_CascadeFullRes import nnUNetTrain
 from utilities.task_name_id_conversion import convert_id_to_task_name
 
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("network")
@@ -161,38 +162,42 @@ def main():
         trainer.save_latest_only = True  # if false it will not store/overwrite _latest but separate files each
 
     trainer.initialize(not validation_only)
+    import numpy as np
+    data = np.random.rand(2,1,512, 780, 172)
+    output = trainer.network(data)
 
-    if find_lr:
-        trainer.find_lr()
-    else:
-        if not validation_only:
-            if args.continue_training:
-                # -c was set, continue a previous training and ignore pretrained weights
-                trainer.load_latest_checkpoint()
-            elif (not args.continue_training) and (args.pretrained_weights is not None):
-                # we start a new training. If pretrained_weights are set, use them
-                load_pretrained_weights(trainer.network, args.pretrained_weights)
-            else:
-                # new training without pretraine weights, do nothing
-                pass
+    # if find_lr:
+    #     trainer.find_lr()
+    # else:
+    #     if not validation_only:
+    #         if args.continue_training:
+    #             # -c was set, continue a previous training and ignore pretrained weights
+    #             trainer.load_latest_checkpoint()
+    #         elif (not args.continue_training) and (args.pretrained_weights is not None):
+    #             # we start a new training. If pretrained_weights are set, use them
+    #             load_pretrained_weights(trainer.network, args.pretrained_weights)
+    #         else:
+    #             # new training without pretraine weights, do nothing
+    #             pass
 
-            trainer.run_training()
-        else:
-            if valbest:
-                trainer.load_best_checkpoint(train=False)
-            else:
-                trainer.load_final_checkpoint(train=False)
+    #         trainer.run_training()
+    #     else:
+    #         if valbest:
+    #             trainer.load_best_checkpoint(train=False)
+    #         else:
+    #             trainer.load_final_checkpoint(train=False)
 
-        trainer.network.eval()
+    #     trainer.network.eval()
 
-        # predict validation
-        trainer.validate(save_softmax=args.npz, validation_folder_name=val_folder,
-                         run_postprocessing_on_folds=not disable_postprocessing_on_folds,
-                         overwrite=args.val_disable_overwrite)
+    #     # predict validation
+        
+    #     trainer.validate(save_softmax=args.npz, validation_folder_name=val_folder,
+    #                      run_postprocessing_on_folds=not disable_postprocessing_on_folds,
+    #                      overwrite=args.val_disable_overwrite)
 
-        if network == '3d_lowres' and not args.disable_next_stage_pred:
-            print("predicting segmentations for the next stage of the cascade")
-            predict_next_stage(trainer, join(dataset_directory, trainer.plans['data_identifier'] + "_stage%d" % 1))
+    #     if network == '3d_lowres' and not args.disable_next_stage_pred:
+    #         print("predicting segmentations for the next stage of the cascade")
+    #         predict_next_stage(trainer, join(dataset_directory, trainer.plans['data_identifier'] + "_stage%d" % 1))
 
 
 if __name__ == "__main__":

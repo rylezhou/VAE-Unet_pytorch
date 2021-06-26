@@ -166,8 +166,8 @@ def main():
     import torch
 
     from utilities.to_torch import maybe_to_torch, to_cuda
-    
-    data = np.random.rand(2,1,512, 780, 172)
+
+    data = np.random.rand(1,1,512, 780, 172)
     data = maybe_to_torch(data)
     if torch.cuda.is_available():
             data = to_cuda(data)

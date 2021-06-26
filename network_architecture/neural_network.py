@@ -307,6 +307,7 @@ class SegmentationNetwork(NeuralNetwork):
 
         # compute the steps for sliding window
         steps = self._compute_steps_for_sliding_window(patch_size, data_shape[1:], step_size)
+        
         num_tiles = len(steps[0]) * len(steps[1]) * len(steps[2])
 
         if verbose:
@@ -379,7 +380,7 @@ class SegmentationNetwork(NeuralNetwork):
                 for z in steps[2]:
                     lb_z = z
                     ub_z = z + patch_size[2]
-
+                    print("type::::",type(data))
                     predicted_patch = self._internal_maybe_mirror_and_pred_3D(
                         data[None, :, lb_x:ub_x, lb_y:ub_y, lb_z:ub_z], mirror_axes, do_mirroring,
                         gaussian_importance_map)[0]

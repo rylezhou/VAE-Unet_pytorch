@@ -83,7 +83,7 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
       
 
         data = maybe_to_torch(data)
-        print("input_shape", data.shape)
+        print("--------------------------input_shape", data.shape)
     
         target = maybe_to_torch(target)
 

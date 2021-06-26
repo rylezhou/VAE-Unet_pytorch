@@ -441,6 +441,7 @@ class NetworkTrainer(object):
 
             # train one epoch
             self.network.train()
+            self.num_batches_per_epoch = 2
 
             if self.use_progress_bar:
                 with trange(self.num_batches_per_epoch) as tbar:

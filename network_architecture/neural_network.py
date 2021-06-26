@@ -380,7 +380,7 @@ class SegmentationNetwork(NeuralNetwork):
                 for z in steps[2]:
                     lb_z = z
                     ub_z = z + patch_size[2]
-                    print("type::::",type(data))
+                    
                     predicted_patch = self._internal_maybe_mirror_and_pred_3D(
                         data[None, :, lb_x:ub_x, lb_y:ub_y, lb_z:ub_z], mirror_axes, do_mirroring,
                         gaussian_importance_map)[0]
@@ -520,7 +520,9 @@ class SegmentationNetwork(NeuralNetwork):
 
         for m in range(mirror_idx):
             if m == 0:
+                print("type::::",type(x))
                 pred = self.inference_apply_nonlin(self(x))
+
                 result_torch += 1 / num_results * pred
 
             if m == 1 and (2 in mirror_axes):

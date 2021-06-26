@@ -164,8 +164,13 @@ def main():
     trainer.initialize(not validation_only)
     import numpy as np
     import torch
+
+    from utilities.to_torch import maybe_to_torch, to_cuda
+    
     data = np.random.rand(2,1,512, 780, 172)
-    data = torch.tensor(data)
+    data = maybe_to_torch(data)
+    if torch.cuda.is_available():
+            data = to_cuda(data)
     output = trainer.network(data)
 
     # if find_lr:

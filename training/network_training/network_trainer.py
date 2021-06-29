@@ -114,7 +114,8 @@ class NetworkTrainer(object):
         self.log_file = None
         self.deterministic = deterministic
 
-        self.use_progress_bar = False
+        # self.use_progress_bar = False
+        self.use_progress_bar = True
         if 'nnunet_use_progress_bar' in os.environ.keys():
             self.use_progress_bar = bool(int(os.environ['nnunet_use_progress_bar']))
 

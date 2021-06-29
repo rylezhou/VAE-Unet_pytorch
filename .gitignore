@@ -85,9 +85,9 @@ ENV/
 
 # test
 tests/
-# nnUNet*/
-# preprocessed/
-# trained_models/
+nnUNet*/
+preprocessed/
+trained_models/
 # Spyder project settings
 .spyderproject
 

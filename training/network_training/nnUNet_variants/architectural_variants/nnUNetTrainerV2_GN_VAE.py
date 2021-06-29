@@ -126,54 +126,23 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
 
         return l.detach().cpu().numpy()
 
-<<<<<<< HEAD
-=======
-
->>>>>>> debugTuple
     def run_online_evaluation(self, output, target):  ## add this for vae
         """
         """
         output = [o[0] for o in output]
         target = [t[0] for t in target]
         return super().run_online_evaluation(output, target)
-<<<<<<< HEAD
-
-    # def predict_preprocessed_data_return_seg_and_softmax(self, data: np.ndarray, do_mirroring: bool = True,
-    #                                                      mirror_axes: Tuple[int] = None,
-    #                                                      use_sliding_window: bool = True, step_size: float = 0.5,
-    #                                                      use_gaussian: bool = True, pad_border_mode: str = 'constant',
-    #                                                      pad_kwargs: dict = None, all_in_gpu: bool = False,
-    #                                                      verbose: bool = True, mixed_precision=True) -> Tuple[np.ndarray, np.ndarray]:
-    #     """
-    #     We need to wrap this because we need to enforce self.network.do_ds = False for prediction
-    #     """
-    #     ds = self.network.do_ds
-    #     self.network.do_ds = False
-    #     # data = self.data[1]
-    #     #(1, 512, 780, 144)
-    #     print("DATA SHAPE",data.shape)
-    #     ret = super().predict_preprocessed_data_return_seg_and_softmax(data,
-    #                                                                    do_mirroring=do_mirroring,
-    #                                                                    mirror_axes=mirror_axes,
-    #                                                                    use_sliding_window=use_sliding_window,
-    #                                                                    step_size=step_size, use_gaussian=use_gaussian,
-    #                                                                    pad_border_mode=pad_border_mode,
-    #                                                                    pad_kwargs=pad_kwargs, all_in_gpu=all_in_gpu,
-    #                                                                    verbose=verbose,
-    #                                                                    mixed_precision=mixed_precision)
-    #     self.network.do_ds = ds
-    #     return ret
     
 
     def _internal_maybe_mirror_and_pred_3D(self, x: Union[np.ndarray, torch.tensor], mirror_axes: tuple,
                                            do_mirroring: bool = True,
                                            mult: np.ndarray or torch.tensor = None) -> torch.tensor:
         assert len(x.shape) == 5, 'x must be (b, c, x, y, z)'
+        print(x.shape)
         # everything in here takes place on the GPU. If x and mult are not yet on GPU this will be taken care of here
         # we now return a cuda tensor! Not numpy array!
 
         x = to_cuda(maybe_to_torch(x), gpu_id=self.get_device())
-        print("torch SHAPE",x.shape)
         result_torch = torch.zeros([1, self.num_classes] + list(x.shape[2:]),
                                    dtype=torch.float).cuda(self.get_device(), non_blocking=True)
 
@@ -187,65 +156,51 @@ class nnUNetTrainerV2_GN_VAE(nnUNetTrainerV2):
             mirror_idx = 1
             num_results = 1
 
+        x, _,_ = self(x)
         for m in range(mirror_idx):
             if m == 0:
-                pred = self.inference_apply_nonlin(self(x))
+                pred = self.inference_apply_nonlin(x)
+                # pred = self.inference_apply_nonlin(self(x))
                 result_torch += 1 / num_results * pred
 
             if m == 1 and (2 in mirror_axes):
-                pred = self.inference_apply_nonlin(self(torch.flip(x, (4, ))))
+                pred = self.inference_apply_nonlin(torch.flip(x, (4, )))
+                # pred = self.inference_apply_nonlin(self(torch.flip(x, (4, ))))
                 result_torch += 1 / num_results * torch.flip(pred, (4,))
 
             if m == 2 and (1 in mirror_axes):
-                pred = self.inference_apply_nonlin(self(torch.flip(x, (3, ))))
+                pred = self.inference_apply_nonlin(torch.flip(x, (3, )))
+                # pred = self.inference_apply_nonlin(self(torch.flip(x, (3, ))))
                 result_torch += 1 / num_results * torch.flip(pred, (3,))
 
             if m == 3 and (2 in mirror_axes) and (1 in mirror_axes):
-                pred = self.inference_apply_nonlin(self(torch.flip(x, (4, 3))))
+                pred = self.inference_apply_nonlin(torch.flip(x, (4, 3)))
+                # pred = self.inference_apply_nonlin(self(torch.flip(x, (4, 3))))
                 result_torch += 1 / num_results * torch.flip(pred, (4, 3))
 
             if m == 4 and (0 in mirror_axes):
-                pred = self.inference_apply_nonlin(self(torch.flip(x, (2, ))))
+                pred = self.inference_apply_nonlin(torch.flip(x, (2, )))
+                # pred = self.inference_apply_nonlin(self(torch.flip(x, (2, ))))
                 result_torch += 1 / num_results * torch.flip(pred, (2,))
 
             if m == 5 and (0 in mirror_axes) and (2 in mirror_axes):
-                pred = self.inference_apply_nonlin(self(torch.flip(x, (4, 2))))
+                pred = self.inference_apply_nonlin(torch.flip(x, (4, 2)))
+                # pred = self.inference_apply_nonlin(self(torch.flip(x, (4, 2))))
                 result_torch += 1 / num_results * torch.flip(pred, (4, 2))
 
             if m == 6 and (0 in mirror_axes) and (1 in mirror_axes):
-                pred = self.inference_apply_nonlin(self(torch.flip(x, (3, 2))))
+                pred = self.inference_apply_nonlin(torch.flip(x, (3, 2)))
+                # pred = self.inference_apply_nonlin(self(torch.flip(x, (3, 2))))
                 result_torch += 1 / num_results * torch.flip(pred, (3, 2))
 
             if m == 7 and (0 in mirror_axes) and (1 in mirror_axes) and (2 in mirror_axes):
-                pred = self.inference_apply_nonlin(self(torch.flip(x, (4, 3, 2))))
+                pred = self.inference_apply_nonlin(torch.flip(x, (4, 3, 2)))
+                # pred = self.inference_apply_nonlin(self(torch.flip(x, (4, 3, 2))))
                 result_torch += 1 / num_results * torch.flip(pred, (4, 3, 2))
 
         if mult is not None:
             result_torch[:, :] *= mult
 
         return result_torch
-
-
-    def validate(self, do_mirroring: bool = True, use_sliding_window: bool = True,
-                 step_size: float = 0.5, save_softmax: bool = True, use_gaussian: bool = True, overwrite: bool = True,
-                 validation_folder_name: str = 'validation_raw', debug: bool = False, all_in_gpu: bool = False,
-                 segmentation_export_kwargs: dict = None, run_postprocessing_on_folds: bool = True):
-        """
-        We need to wrap this because we need to enforce self.network.do_ds = False for prediction
-        """
-        ds = self.network.do_ds
-        self.network.do_ds = False
-        ret = super().validate(do_mirroring=do_mirroring, use_sliding_window=use_sliding_window, step_size=step_size,
-                               save_softmax=save_softmax, use_gaussian=use_gaussian,
-                               overwrite=overwrite, validation_folder_name=validation_folder_name, debug=debug,
-                               all_in_gpu=all_in_gpu, segmentation_export_kwargs=segmentation_export_kwargs,
-                               run_postprocessing_on_folds=run_postprocessing_on_folds)
-
-        self.network.do_ds = ds
-        return ret   
-=======
-    
-
->>>>>>> debugTuple
 
     

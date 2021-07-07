@@ -43,7 +43,7 @@ def preprocess_save_to_queue(preprocess_fn, q, list_of_lists, output_files, segs
             output_file = output_files[i]
             print("preprocessing", output_file)
             d, _, dct = preprocess_fn(l)
-            # print(output_file, dct)
+            print(output_file, dct)
             if segs_from_prev_stage[i] is not None:
                 assert isfile(segs_from_prev_stage[i]) and segs_from_prev_stage[i].endswith(
                     ".nii.gz"), "segs_from_prev_stage" \

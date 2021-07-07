@@ -80,7 +80,7 @@ def main():
 
         tasks.append(task_name)
 
-    search_in = join(__path__[0], "experiment_planning")
+    search_in = join(__path__.pop(0), "experiment_planning")
 
     if planner_name3d is not None:
         planner_3d = recursive_find_python_class([search_in], planner_name3d, current_module="experiment_planning")

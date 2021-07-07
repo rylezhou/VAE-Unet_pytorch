@@ -79,7 +79,7 @@ def preprocess_save_to_queue(preprocess_fn, q, list_of_lists, output_files, segs
             raise KeyboardInterrupt
         except Exception as e:
             print("error in", l)
-            print(e)
+            print("ERROR:",e)
     q.put("end")
     if len(errors_in) > 0:
         print("There were some errors in the following cases:", errors_in)

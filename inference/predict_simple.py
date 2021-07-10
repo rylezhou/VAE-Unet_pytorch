@@ -25,12 +25,12 @@ def main():
     parser.add_argument("-i", '--input_folder', help="Must contain all modalities for each patient in the correct"
                                                      " order (same as training). Files must be named "
                                                      "CASENAME_XXXX.nii.gz where XXXX is the modality "
-                                                     "identifier (0000, 0001, etc)", required=True, default='/home/jupyter/nnUNet-pytorch/nnUNet_raw_data_base/nnUNet_raw_data/Task103_all/imagesTs/')
-    parser.add_argument('-o', "--output_folder", required=True, help="folder for saving predictions",default='/home/jupyter/sunet-pytorch/prediction/')
+                                                     "identifier (0000, 0001, etc)", required=False, default='/home/jupyter/nnUNet-pytorch/nnUNet_raw_data_base/nnUNet_raw_data/Task103_all/imagesTs/')
+    parser.add_argument('-o', "--output_folder", required=False, help="folder for saving predictions",default='/home/jupyter/sunet-pytorch/prediction/')
     # parser.add_argument('-t', '--task_name', help='task name or task ID, required.',
                         # default=default_plans_identifier, required=True)
     parser.add_argument('-t', '--task_name', help='task name or task ID, required.',
-                        default='103', required=True)
+                        default='103', required=False)
                         
 
     # parser.add_argument('-tr', '--trainer_class_name',

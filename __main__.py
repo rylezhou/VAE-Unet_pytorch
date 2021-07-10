@@ -1,6 +1,4 @@
 
-from __future__ import absolute_import
-from . import *
 #    Copyright 2020 Division of Medical Image Computing, German Cancer Research Center (DKFZ), Heidelberg, Germany
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");

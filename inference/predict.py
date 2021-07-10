@@ -13,7 +13,7 @@
 #    limitations under the License.
 
 
-
+__path__ = __import__('pkgutil').extend_path(__path__, __name__)
 import argparse
 from copy import deepcopy
 from typing import Tuple, Union, List

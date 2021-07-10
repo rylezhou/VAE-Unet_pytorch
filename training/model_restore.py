@@ -64,7 +64,8 @@ def restore_model(pkl_file, checkpoint=None, train=False, fp16=None):
         """
         try:
             import meddec
-            search_in = join(meddec.__path__[0], "model_training")
+            # search_in = join(meddec.__path__[0], "model_training")
+            search_in = '/home/jupyter/sunet-pytorch/trained_models'
             tr = recursive_find_python_class([search_in], name, current_module="meddec.model_training")
         except ImportError:
             pass

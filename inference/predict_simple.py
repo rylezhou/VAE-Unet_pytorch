@@ -45,7 +45,7 @@ def main():
     #                     default=default_trainer)
     parser.add_argument('-tr', '--trainer_class_name',
                         required=False,
-                        default='nnUNetTrainerV2_GN_VA')
+                        default='nnUNetTrainerV2_GN_VAE')
     parser.add_argument('-ctr', '--cascade_trainer_class_name',
                         help="Trainer class name used for predicting the 3D full resolution U-Net part of the cascade."
                              "Default is %s" % default_cascade_trainer, required=False,

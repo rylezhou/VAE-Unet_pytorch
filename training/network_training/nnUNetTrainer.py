@@ -430,7 +430,10 @@ class nnUNetTrainer(NetworkTrainer):
                 preprocessor_name = "PreprocessorFor2D"
 
         print("using preprocessor", preprocessor_name)
-        preprocessor_class = recursive_find_python_class([join(__path__[0], "preprocessing")],
+        # preprocessor_class = recursive_find_python_class([join(__path__[0], "preprocessing")],
+        #                                                  preprocessor_name,
+        #                                                  current_module="preprocessing")
+        preprocessor_class = recursive_find_python_class([join("/home/jupyter/sunet-pytorch/","preprocessing")],
                                                          preprocessor_name,
                                                          current_module="preprocessing")
         assert preprocessor_class is not None, "Could not find preprocessor %s in preprocessing" % \

@@ -325,7 +325,7 @@ def aggregate_scores(test_ref_pairs,
                      json_output_file=None,
                      json_name="",
                      json_description="",
-                     json_author="Fabian",
+                     json_author="Ryle",
                      json_task="",
                      num_threads=2,
                      **metric_kwargs):

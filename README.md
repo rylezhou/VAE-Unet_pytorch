@@ -1,1 +1,1 @@
-# Official Pytorch impletation of VAE-Unet
+# Official Pytorch implementation of VAE-Unet

@@ -1,1 +1,1 @@
-# sunet-pytorch
+# Official Pytorch implementation of VAE-Unet

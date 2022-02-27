@@ -55,7 +55,8 @@ def restore_model(pkl_file, checkpoint=None, train=False, fp16=None):
     info = load_pickle(pkl_file)
     init = info['init']
     name = info['name']
-    search_in = join(__path__[0], "training", "network_training")
+    # search_in = join(__path__[0], "training", "network_training")
+    search_in = join('/home/jupyter/sunet-pytorch/', "training", "network_training")
     tr = recursive_find_python_class([search_in], name, current_module="training.network_training")
 
     if tr is None:
@@ -64,7 +65,8 @@ def restore_model(pkl_file, checkpoint=None, train=False, fp16=None):
         """
         try:
             import meddec
-            search_in = join(meddec.__path__[0], "model_training")
+            # search_in = join(meddec.__path__[0], "model_training")
+            search_in = '/home/jupyter/sunet-pytorch/'
             tr = recursive_find_python_class([search_in], name, current_module="meddec.model_training")
         except ImportError:
             pass

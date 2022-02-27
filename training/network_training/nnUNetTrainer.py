@@ -431,7 +431,7 @@ class nnUNetTrainer(NetworkTrainer):
                 preprocessor_name = "PreprocessorFor2D"
 
         print("using preprocessor", preprocessor_name)
-        preprocessor_class = recursive_find_python_class([join(__path__[0], "preprocessing")],
+        preprocessor_class = recursive_find_python_class([join("/home/jupyter/sunet-pytorch/","preprocessing")],
                                                          preprocessor_name,
                                                          current_module="preprocessing")
         assert preprocessor_class is not None, "Could not find preprocessor %s in preprocessing" % \
@@ -592,8 +592,9 @@ class nnUNetTrainer(NetworkTrainer):
             if overwrite or (not isfile(join(output_folder, fname + ".nii.gz"))) or \
                     (save_softmax and not isfile(join(output_folder, fname + ".npz"))):
                 data = np.load(self.dataset[k]['data_file'])['data']
-                #(2, 512, 780, 144)
-                # print("Data Shape", data.shape)
+                
+                # DEBUG: Data_Shape (2, 512, 780, 172)
+                # print("Data_Shape", data.shape)
 
                 print(k, data.shape)
                 # data[-1][data[-1] == -1] = 0

@@ -85,21 +85,12 @@ ENV/
 
 # test
 tests/
-<<<<<<< HEAD
- nnUNet*/
- preprocessed/
- trained_models/
-=======
-<<<<<<< HEAD
- nnUNet*/
- preprocessed/
- trained_models/
-=======
+
 nnUNet*/
 preprocessed/
 trained_models/
->>>>>>> debugTuple
->>>>>>> c3a636bfc68170207ddc87cf28cde3a01622823d
+prediction/
+
 # Spyder project settings
 .spyderproject
 

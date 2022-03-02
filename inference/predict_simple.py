@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-__path__ = ['/home/jupyter/sunet-pytorch']
+# __path__ = ['/home/jupyter/sunet-pytorch']
 import argparse
 import torch
 

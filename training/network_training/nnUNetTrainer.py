@@ -39,6 +39,7 @@ from utilities.nd_softmax import softmax_helper
 from utilities.tensor_utilities import sum_tensor
 from torch import nn
 from torch.optim import lr_scheduler
+from utilities.to_torch import maybe_to_torch, to_cuda
 
 
 matplotlib.use("agg")
@@ -430,7 +431,7 @@ class nnUNetTrainer(NetworkTrainer):
                 preprocessor_name = "PreprocessorFor2D"
 
         print("using preprocessor", preprocessor_name)
-        preprocessor_class = recursive_find_python_class([join(__path__[0], "preprocessing")],
+        preprocessor_class = recursive_find_python_class([join("/home/jupyter/VAE-Unet_pytorch/","preprocessing")],
                                                          preprocessor_name,
                                                          current_module="preprocessing")
         assert preprocessor_class is not None, "Could not find preprocessor %s in preprocessing" % \
@@ -515,12 +516,14 @@ class nnUNetTrainer(NetworkTrainer):
 
         current_mode = self.network.training
         self.network.eval()
-        ret = self.network.predict_3D(data, do_mirroring=do_mirroring, mirror_axes=mirror_axes,
-                                      use_sliding_window=use_sliding_window, step_size=step_size,
-                                      patch_size=self.patch_size, regions_class_order=self.regions_class_order,
-                                      use_gaussian=use_gaussian, pad_border_mode=pad_border_mode,
-                                      pad_kwargs=pad_kwargs, all_in_gpu=all_in_gpu, verbose=verbose,
-                                      mixed_precision=mixed_precision)
+        # ret = self.network.predict_3D(data, do_mirroring=do_mirroring, mirror_axes=mirror_axes,
+        #                               use_sliding_window=use_sliding_window, step_size=step_size,
+        #                               patch_size=self.patch_size, regions_class_order=self.regions_class_order,
+        #                               use_gaussian=use_gaussian, pad_border_mode=pad_border_mode,
+        #                               pad_kwargs=pad_kwargs, all_in_gpu=all_in_gpu, verbose=verbose,
+        #                               mixed_precision=mixed_precision)
+        data = maybe_to_torch(data)
+        ret = self.network(data)
         self.network.train(current_mode)
         return ret
 
@@ -589,9 +592,12 @@ class nnUNetTrainer(NetworkTrainer):
             if overwrite or (not isfile(join(output_folder, fname + ".nii.gz"))) or \
                     (save_softmax and not isfile(join(output_folder, fname + ".npz"))):
                 data = np.load(self.dataset[k]['data_file'])['data']
+                
+                # DEBUG: Data_Shape (2, 512, 780, 172)
+                # print("Data_Shape", data.shape)
 
                 print(k, data.shape)
-                data[-1][data[-1] == -1] = 0
+                # data[-1][data[-1] == -1] = 0
 
                 softmax_pred = self.predict_preprocessed_data_return_seg_and_softmax(data[:-1],
                                                                                      do_mirroring=do_mirroring,
